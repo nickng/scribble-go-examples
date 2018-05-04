@@ -1,0 +1,44 @@
+//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter -param-api Scatter B
+
+package main
+
+import (
+	"log"
+	"sync"
+
+	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter/B_1toK"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
+	"github.com/rhu1/scribble-go-runtime/runtime/session2"
+	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
+)
+
+const (
+	k = 2
+)
+
+func main() {
+	s := Scatter.New()
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+	go b(s, 1, wg)
+	go b(s, 2, wg)
+	wg.Wait()
+}
+
+func b(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
+	ln, err := tcp.Listen(3333 + id - 1)
+	if err != nil {
+		log.Fatalf("Cannot listen: %v", err)
+	}
+	B := s.New_B_1toK(k, id)
+	if err := B.A_1to1_Accept(id, ln, new(session2.GobFormatter)); err != nil {
+		log.Fatal(err)
+	}
+	B.Run(func(s *B_1toK.Init_8) B_1toK.End {
+		d := make([]onetomany.Data, k)
+		end := s.A_1to1_Gather_Data(d)
+		return *end
+	})
+	wg.Done()
+}

@@ -1,0 +1,17 @@
+// OneToMany - the "scatter" pattern.
+
+module OneToMany;
+
+sig <go> "onetomany.Data" from "github.com/nickng/scribble-go-examples/1_one-to-many/onetomany" as Data;
+
+// Scatter is the basic one-to-many scatter pattern.
+global protocol Scatter(role A, role B) {
+  Data from A[1,1] to B[1,K];
+}
+
+// Foreach is the foreach-based one-to-many scatter pattern.
+global protocol Foreach(role A, role B) {
+  foreach B[I:1,K] {
+    Data from A[1,1] to B[I,I];
+  }
+}
