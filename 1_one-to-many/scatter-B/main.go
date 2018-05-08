@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter -param-api Scatter B
+//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter -param-api github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany B
 
 package main
 
@@ -14,9 +14,7 @@ import (
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 )
 
-const (
-	k = 2
-)
+const k = 2
 
 func init() {
 	var data onetomany.Data
@@ -27,12 +25,12 @@ func main() {
 	s := Scatter.New()
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
-	go b(s, 1, wg)
-	go b(s, 2, wg)
+	go gather(s, 1, wg)
+	go gather(s, 2, wg)
 	wg.Wait()
 }
 
-func b(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
+func gather(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
 	ln, err := tcp.Listen(3333 + id - 1)
 	if err != nil {
 		log.Fatalf("Cannot listen: %v", err)
