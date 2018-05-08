@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"sync"
 
@@ -16,6 +17,11 @@ import (
 const (
 	k = 2
 )
+
+func init() {
+	var data onetomany.Data
+	gob.Register(data)
+}
 
 func main() {
 	s := Scatter.New()
@@ -32,11 +38,11 @@ func b(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
 		log.Fatalf("Cannot listen: %v", err)
 	}
 	B := s.New_B_1toK(k, id)
-	if err := B.A_1to1_Accept(id, ln, new(session2.GobFormatter)); err != nil {
+	if err := B.A_1to1_Accept(1, ln, new(session2.GobFormatter)); err != nil {
 		log.Fatal(err)
 	}
 	B.Run(func(s *B_1toK.Init_8) B_1toK.End {
-		d := make([]onetomany.Data, k)
+		d := make([]onetomany.Data, 1)
 		end := s.A_1to1_Gather_Data(d)
 		return *end
 	})
