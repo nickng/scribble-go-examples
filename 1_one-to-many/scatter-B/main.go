@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter -param-api github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany B
+//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 
 package main
 
@@ -18,7 +18,7 @@ const k = 2
 
 func init() {
 	var data onetomany.Data
-	gob.Register(data)
+	gob.Register(&data)
 }
 
 func main() {
@@ -39,7 +39,7 @@ func gather(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
 	if err := B.A_1to1_Accept(1, ln, new(session2.GobFormatter)); err != nil {
 		log.Fatal(err)
 	}
-	B.Run(func(s *B_1toK.Init_8) B_1toK.End {
+	B.Run(func(s *B_1toK.Init) B_1toK.End {
 		d := make([]onetomany.Data, 1)
 		end := s.A_1to1_Gather_Data(d)
 		return *end

@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter -param-api github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany A
+//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 
 package main
 
@@ -17,7 +17,7 @@ const k = 2
 
 func init() {
 	var data onetomany.Data
-	gob.Register(data)
+	gob.Register(&data)
 }
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	A.Run(func(s *A_1to1.Init_4) A_1to1.End {
+	A.Run(func(s *A_1to1.Init) A_1to1.End {
 		var d []onetomany.Data
 		for i := 0; i < k; i++ {
 			d = append(d, onetomany.Data{V: i})

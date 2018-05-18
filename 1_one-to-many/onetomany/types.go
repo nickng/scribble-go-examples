@@ -1,8 +1,9 @@
 package onetomany
 
 // Data is the default payload type.
-type Data int
-
-func (Data) GetOp() string {
-	return "Data"
+type Data struct {
+	V int
 }
+
+// GetOp returns the message label.
+func (Data) GetOp() string { return "Data" }
