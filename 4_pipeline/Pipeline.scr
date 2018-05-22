@@ -1,0 +1,9 @@
+// Pipeline - the pipeline protocol
+
+module Pipeline;
+
+sig <go> "message.Next" from "github.com/nickng/scribble-go-examples/4_pipeline/message" as Next;
+
+global protocol Pipeline(role W) {
+  Next pipe W[1,K];
+}

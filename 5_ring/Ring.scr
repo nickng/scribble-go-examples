@@ -1,0 +1,17 @@
+// Ring - pipeline with wraparound connection
+
+module Ring;
+
+sig <go> "message.Next" from "github.com/nickng/scribble-go-examples/5_ring/message" as Next;
+sig <go> "message.Done" from "github.com/nickng/scribble-go-examples/5_ring/message" as Done;
+
+global protocol Ring(role W) {
+  choice at W[1] {
+    Next pipe W[1,K];
+    Next from W[K] to W[1];
+    do Ring(W);
+  } or {
+    Done pipe W[1,K];
+    Done from W[K] to W[1];
+  }
+}
