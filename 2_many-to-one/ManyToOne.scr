@@ -1,0 +1,17 @@
+// ManyToOne - the "gather" pattern
+
+module ManyToOne;
+
+sig <go> "message.Data" from "github.com/nickng/scribble-go-examples/2_many-to-one/message" as Data;
+
+// Gather is the basic many-to-one gather pattern.
+global protocol Gather(role A, role B) {
+  Data from A[1,K] to B[1,1];
+}
+
+// Foreach is the foreach-based many-to-one gather pattern.
+global protocol Foreach(role A, role B) {
+  foreach A[I:1,K] {
+    Data from A[I,I] to B[1,1];
+  }
+}
