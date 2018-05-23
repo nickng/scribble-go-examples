@@ -1,0 +1,15 @@
+module Microbenchmarks;
+
+sig <go> "message.Int" from "github.com/nickng/scribble-go-examples/microbenchmarks/message" as Int;
+
+global protocol Scatter(role A, role B) {
+  Int from A[1,1] to B[1,N];
+}
+
+global protocol Gather(role A, role B) {
+  Int from A[1,N] to B[1,1];
+}
+
+global protocol Alltoall(role A, role B) {
+  Int from A[1,M] to B[1,N];
+}
