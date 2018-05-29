@@ -43,50 +43,22 @@ func initSM(t testing.TB, Count, N int) (roles []rolesScatter, cleanupFn func())
 	wg.Add(1 + N)
 	go func() {
 		for c := 0; c < Count; c++ {
-			if c == 0 {
-				for n := 0; n < N; n++ {
-					if err := roles[c].A.B_1toN_Dial(1+n, "", c*N+n, shm.Dial, new(session.PassByPointer)); err != nil {
-						t.Error(err)
-					}
-				}
-				roles[c].A.MPChan.CheckConnection()
-			} else {
-				// Reuse connection
-				for role, conns := range roles[c-1].A.MPChan.Conns {
-					for id, conn := range conns {
-						roles[c].A.MPChan.Conns[role][id] = conn
-					}
-				}
-				for role, fmts := range roles[c-1].A.MPChan.Fmts {
-					for id, f := range fmts {
-						roles[c].A.MPChan.Fmts[role][id] = f
-					}
+			for n := 0; n < N; n++ {
+				if err := roles[c].A.B_1toN_Dial(1+n, "", c*N+n, shm.Dial, new(session.PassByPointer)); err != nil {
+					t.Error(err)
 				}
 			}
+			roles[c].A.MPChan.CheckConnection()
 		}
 		wg.Done()
 	}()
 	for n := 0; n < N; n++ {
 		go func(n int) {
 			for c := 0; c < Count; c++ {
-				if c == 0 {
-					if err := roles[c].BN[n].A_1to1_Accept(1, lnN[c][n], new(session.PassByPointer)); err != nil {
-						t.Error(err)
-					}
-					roles[c].BN[n].MPChan.CheckConnection()
-				} else {
-					// Reuse connection
-					for role, conns := range roles[c-1].BN[n].MPChan.Conns {
-						for id, conn := range conns {
-							roles[c].BN[n].MPChan.Conns[role][id] = conn
-						}
-					}
-					for role, fmts := range roles[c-1].BN[n].MPChan.Fmts {
-						for id, f := range fmts {
-							roles[c].BN[n].MPChan.Fmts[role][id] = f
-						}
-					}
+				if err := roles[c].BN[n].A_1to1_Accept(1, lnN[c][n], new(session.PassByPointer)); err != nil {
+					t.Error(err)
 				}
+				roles[c].BN[n].MPChan.CheckConnection()
 			}
 			wg.Done()
 		}(n)
