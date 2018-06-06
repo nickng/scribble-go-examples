@@ -29,9 +29,9 @@ func initSM(t testing.TB, Count, N int) (roles []rolesScatter, cleanupFn func())
 		// ---- Protocol initialisation END ----
 	}
 	var err error
-	lnN := make([][]*shm.ShmListener, Count)
+	lnN := make([][]*shm.Listener, Count)
 	for c := 0; c < Count; c++ {
-		lnN[c] = make([]*shm.ShmListener, N)
+		lnN[c] = make([]*shm.Listener, N)
 		for n := 0; n < N; n++ {
 			lnN[c][n], err = shm.Listen(c*N + n)
 			if err != nil {
