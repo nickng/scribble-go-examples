@@ -18,13 +18,11 @@ panic(s.Err)
 if s.id != s.Ept.lin {
 panic("Linear resource already used")
 }
-var err error
 for i, j := 1, 0; i <= s.Ept.N; i, j = i+1, j+1 {
-err = s.Ept.MPChan.MSend("B", i, &arg0[j])
+s.Ept._End.Err = s.Ept.MPChan.MSend("B", i, &arg0[j])
 }
-succ := s.Ept._End
 s.Ept.lin = s.Ept.lin + 1
-succ.id = s.Ept.lin
-succ.Err = err
-return succ
+s.Ept._End.id = s.Ept.lin
+return s.Ept._End
+
 }

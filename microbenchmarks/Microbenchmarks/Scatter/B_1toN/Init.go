@@ -25,21 +25,18 @@ panic(s.Err)
 if s.id != s.Ept.lin {
 panic("Linear resource already used")
 }
-var err error
 for i := 1; i <= 1; i++ {
 var tmp session2.ScribMessage
-if err = s.Ept.MPChan.MRecv("A", i, &tmp); err != nil {
-succ := s.Ept._End
+if s.Ept._End.Err = s.Ept.MPChan.MRecv("A", i, &tmp); s.Ept._End.Err != nil {
 s.Ept.lin = s.Ept.lin + 1
-succ.id = s.Ept.lin
-succ.Err = err
-return succ
+s.Ept._End.id = s.Ept.lin
+return s.Ept._End
+
 }
 arg0[i-1] = *(tmp.(*message.Int))
 }
-succ := s.Ept._End
 s.Ept.lin = s.Ept.lin + 1
-succ.id = s.Ept.lin
-succ.Err = err
-return succ
+s.Ept._End.id = s.Ept.lin
+return s.Ept._End
+
 }
