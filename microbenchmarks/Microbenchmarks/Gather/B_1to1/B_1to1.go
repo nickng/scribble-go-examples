@@ -33,6 +33,8 @@ return ep
 }
 
 func (ini *B_1to1) A_1toN_Accept(id int, ss transport2.ScribListener, sfmt session2.ScribMessageFormatter) error {
+defer ini.MPChan.ConnWg.Done()
+ini.MPChan.ConnWg.Add(1)
 c, err := ss.Accept()
 sfmt.Wrap(c)
 ini.MPChan.Conns["A"][id] = c
@@ -41,6 +43,8 @@ return err
 }
 
 func (ini *B_1to1) A_1toN_Dial(id int, host string, port int, dialler func (string, int) (transport2.BinChannel, error), sfmt session2.ScribMessageFormatter) error {
+defer ini.MPChan.ConnWg.Done()
+ini.MPChan.ConnWg.Add(1)
 c, err := dialler(host, port)
 sfmt.Wrap(c)
 ini.MPChan.Conns["A"][id] = c
@@ -48,10 +52,9 @@ ini.MPChan.Fmts["A"][id] = sfmt
 return err
 }
 
-func (ini *B_1to1) Run(f func(*Init) End) *End {
+func (ini *B_1to1) Run(f func(*Init) End) End {
 //defer ini.MPChan.Close()
 ini.Use()
 ini.MPChan.CheckConnection()
-end := f(ini._Init)
-return &end
+return f(ini._Init)
 }
