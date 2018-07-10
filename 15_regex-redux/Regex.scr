@@ -1,0 +1,13 @@
+module Regex;
+
+sig <go> "message.Count"    from "github.com/nickng/scribble-go-examples/15_regex-redux/message" as Count;
+sig <go> "message.Measure" from "github.com/nickng/scribble-go-examples/15_regex-redux/message" as Measure;
+sig <go> "message.Donec" from "github.com/nickng/scribble-go-examples/15_regex-redux/message" as Donec;
+sig <go> "message.Len" from "github.com/nickng/scribble-go-examples/15_regex-redux/message" as Len;
+
+global protocol Proto(role A, role B, role C) {
+  Count from A[1,1] to B[1,K];
+  Measure from A[1,1] to C[1,1];
+  Donec from B[1,K] to A[1,1];
+  Len from C[1,1] to A[1,1];
+}
