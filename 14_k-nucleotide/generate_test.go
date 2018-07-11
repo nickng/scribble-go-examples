@@ -1,4 +1,3 @@
-//go:generate scribblec-param.sh KNuc.scr -d . -param Proto github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc -param-api A -param-api B -param-api S
 //go:generate sh -c "go run ../tools/fasta/fasta.go -n 1000 > ./input/input_1.fasta"
 //go:generate sh -c "go run ../tools/fasta/fasta.go -n 12500000 > ./input/input_2.fasta"
 //go:generate sh -c "go run ../tools/fasta/fasta.go -n 25000000 > ./input/input_3.fasta"

@@ -1,13 +1,11 @@
 module KNuc;
 
-sig <go> "message.Sort" from "github.com/nickng/scribble-go-examples/14_k-nucleotide/message" as Sort;
-sig <go> "message.Match" from "github.com/nickng/scribble-go-examples/14_k-nucleotide/message" as Match;
-sig <go> "message.Done" from "github.com/nickng/scribble-go-examples/14_k-nucleotide/message" as Done;
-sig <go> "message.Gather" from "github.com/nickng/scribble-go-examples/14_k-nucleotide/message" as Gather;
+type <go> "int"    from "builtin" as int;
+type <go> "string" from "builtin" as string;
 
 global protocol Proto(role A, role B, role S) {
-  Sort   from A[1,1] to S[1,2];
-  Match  from A[1,1] to B[1,K];
-  Done   from S[1,2] to A[1,1];
-  Gather from B[1,K] to A[1,1];
+  Sort(int)      from A[1,1] to S[1,2];
+  Match(string)  from A[1,1] to B[1,K];
+  Done(int)      from S[1,2] to A[1,1];
+  Gather(string) from B[1,K] to A[1,1];
 }
