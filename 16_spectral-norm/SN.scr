@@ -1,26 +1,22 @@
 module SN;
 
-sig <go> "message.Times" from "github.com/nickng/scribble-go-examples/16_spectral-norm/message" as Times;
-sig <go> "message.Done" from "github.com/nickng/scribble-go-examples/16_spectral-norm/message" as Done;
-sig <go> "message.Next" from "github.com/nickng/scribble-go-examples/16_spectral-norm/message" as Next;
-sig <go> "message.TimeStr" from "github.com/nickng/scribble-go-examples/16_spectral-norm/message" as TimeStr;
-sig <go> "message.End" from "github.com/nickng/scribble-go-examples/16_spectral-norm/message" as End;
+type <go> "int" from "builtin" as int;
 
 global protocol Proto(role A, role B) {
   choice at A[1] {
-    Times from A[1,1] to B[1,K]; // u x v
-    Done  from B[1,K] to A[1,1];
-    Next from A[1,1] to B[1,K]; // v x u
-    Done  from B[1,K] to A[1,1];
+    Times(int) from A[1,1] to B[1,K]; // u x v
+    Done(int)  from B[1,K] to A[1,1];
+    Next(int)  from A[1,1] to B[1,K]; // v x u
+    Done(int)  from B[1,K] to A[1,1];
 
-    TimeStr from A[1,1] to B[1,K]; // v x u
-    Done  from B[1,K] to A[1,1];
-    Next from A[1,1] to B[1,K]; // v x u
-    Done  from B[1,K] to A[1,1];
+    TimeStr(int) from A[1,1] to B[1,K]; // v x u
+    Done(int)    from B[1,K] to A[1,1];
+    Next(int)    from A[1,1] to B[1,K]; // v x u
+    Done(int)    from B[1,K] to A[1,1];
 
     do Proto(A, B);
   } or {
-    End from A[1,1] to B[1,K];
+    End(int) from A[1,1] to B[1,K];
   }
 }
 
