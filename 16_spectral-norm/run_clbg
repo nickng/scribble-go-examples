@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SRC_DIRS="scribble original"
+INPUTS="2000 3000 5500 11000"
+
+for SRC_DIR in $SRC_DIRS; do
+    for INPUT in $INPUTS; do
+        for NCPU in $(seq 1 16); do
+            for ITER in $(seq 1 20); do
+                echo "($ITER of 20) ./$SRC_DIR/$SRC_DIR -ncpu $NCPU -n $INPUT >> ./$SRC_DIR.time"
+                ./$SRC_DIR/$SRC_DIR -ncpu $NCPU -n $INPUT >> ./$SRC_DIR.time
+            done
+        done
+    done
+done
