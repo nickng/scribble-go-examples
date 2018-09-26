@@ -14,14 +14,15 @@ func ParseFlags() (func(int) (transport2.ScribListener, error),
 			func(host string, port int) (transport2.BinChannel, error),
 			func() session2.ScribMessageFormatter,
 			int, int) {
-	trnsprt := *flag.String("t", "tcp", "Transport: tcp/shm")
-  port:= *flag.Int("port", 33333, "base port for server sockets")
-	K := *flag.Int("K", 2, "K parameter value")
+	trnsprt := flag.String("t", "tcp", "Transport: tcp/shm")  // N.B. cannot deref here -- gives default value before parsing
+  port:= flag.Int("port", 33333, "base port for server sockets")
+	K := flag.Int("K", 2, "K parameter value")
   flag.Parse()
+
 	var listen func(int) (transport2.ScribListener, error)
 	var dial func(host string, port int) (transport2.BinChannel, error)
 	var fmtr func() session2.ScribMessageFormatter
-	switch trnsprt {
+	switch *trnsprt {
 	case "tcp":
 		listen = tcp.BListen
 		dial = tcp.Dial
@@ -33,5 +34,5 @@ func ParseFlags() (func(int) (transport2.ScribListener, error),
 	default:
 		log.Fatal("Unknown transport: ", trnsprt)
 	}
-	return listen, dial, fmtr, port, K
+	return listen, dial, fmtr, *port, *K
 }

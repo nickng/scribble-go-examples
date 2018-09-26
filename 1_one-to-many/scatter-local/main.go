@@ -1,6 +1,6 @@
 //rhu@HZHL4 ~/code/go
 //$ go install github.com/nickng/scribble-go-examples/1_one-to-many/scatter-local
-//$ bin/scatter-local.exe
+//$ bin/scatter-local.exe -t=shm
 
 //go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 
@@ -23,7 +23,6 @@ func init() {
 	gob.Register(&data)
 }
 
-//..HERE: take CL arg for transport
 func main() {
 	listen, dial, fmtr, port, K := scributil.ParseFlags()
 
