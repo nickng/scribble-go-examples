@@ -9,7 +9,7 @@
 
 module OneToMany;
 
-sig <go> "onetomany.Data" from "github.com/nickng/scribble-go-examples/1_one-to-many/messages" as Data;
+sig <go> "messages.Data" from "github.com/nickng/scribble-go-examples/1_one-to-many/messages" as Data;
 
 // Scatter is the basic one-to-many scatter pattern.
 global protocol Scatter(role A, role B) {

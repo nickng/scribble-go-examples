@@ -12,20 +12,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
-	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
-
 	"github.com/nickng/scribble-go-examples/scributil"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/scatter"
 )
 
-var _ = shm.Listen
-var _ = tcp.Listen
-
 func init() {
-	var data onetomany.Data
+	var data messages.Data
 	gob.Register(&data)
 }
 
