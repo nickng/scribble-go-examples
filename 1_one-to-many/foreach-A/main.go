@@ -8,7 +8,7 @@ import (
 
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach/A_1to1"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 )
@@ -27,7 +27,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	A.Run(func(s *A_1to1.Init_8) A_1to1.End {
+	A.Run(func(s *A_1to1.Init) A_1to1.End {
 		var d []onetomany.Data
 		for i := 0; i < k; i++ {
 			d = append(d, onetomany.Data{V: i})

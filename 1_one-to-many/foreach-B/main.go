@@ -9,7 +9,7 @@ import (
 
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach/B_1toK"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 )
@@ -39,7 +39,7 @@ func gather(s *Foreach.Foreach, id int, wg *sync.WaitGroup) {
 	if err := B.A_1to1_Accept(1, ln, new(session2.GobFormatter)); err != nil {
 		log.Fatal(err)
 	}
-	B.Run(func(s *B_1toK.Init_12) B_1toK.End {
+	B.Run(func(s *B_1toK.Init) B_1toK.End {
 		d := make([]onetomany.Data, 1)
 		end := s.A_1to1_Gather_Data(d)
 		return *end

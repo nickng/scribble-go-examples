@@ -1,20 +1,27 @@
+//rhu@HZHL4 ~/code/go
+//$ go install github.com/nickng/scribble-go-examples/1_one-to-many/scatter-B
+//$ bin/scatter-B.exe
+
 //go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
+
 
 package main
 
 import (
 	"encoding/gob"
-	"log"
 	"sync"
 
-	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter/B_1toK"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
+	//"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
+
+	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/scatter"
 )
 
-const k = 2
+//var _ = shm.Listen
+var _ = tcp.Listen
 
 func init() {
 	var data onetomany.Data
@@ -22,27 +29,18 @@ func init() {
 }
 
 func main() {
-	s := Scatter.New()
+	port := 33333
+	K := 2
+	p := Scatter.New()  // FIXME: K should be param here?
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
-	go gather(s, 1, wg)
-	go gather(s, 2, wg)
+	listen := tcp.BListen
+	fmtr := func() session2.ScribMessageFormatter { return new(session2.GobFormatter) } 
+	/*// Not applicable to distributed scenario
+	dial := shm.Dial
+	fmtr := func() session2.ScribMessageFormatter { return new(session2.PassByPointer) }*/
+	for i := 1; i <= K; i++ {
+		go scatter.Server_gather(listen, fmtr, port+i, p, K, i, wg)
+	}
 	wg.Wait()
-}
-
-func gather(s *Scatter.Scatter, id int, wg *sync.WaitGroup) {
-	ln, err := tcp.Listen(3333 + id - 1)
-	if err != nil {
-		log.Fatalf("Cannot listen: %v", err)
-	}
-	B := s.New_B_1toK(k, id)
-	if err := B.A_1to1_Accept(1, ln, new(session2.GobFormatter)); err != nil {
-		log.Fatal(err)
-	}
-	B.Run(func(s *B_1toK.Init) B_1toK.End {
-		d := make([]onetomany.Data, 1)
-		end := s.A_1to1_Gather_Data(d)
-		return *end
-	})
-	wg.Done()
 }
