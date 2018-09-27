@@ -26,14 +26,15 @@ func init() {
 // FIXME: -t=shm crashes
 func main() {
 	listen, dial, fmtr, port, K := scributil.ParseFlags()
+	wg := new(sync.WaitGroup)
+	wg.Add(K)
 
 	p := Foreach.New()  // FIXME: K should be param here?
-	wg := new(sync.WaitGroup)
-	wg.Add(2)
 	for i := 1; i <= K; i++ {
 		go foreach.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}
 	time.Sleep(100 * time.Millisecond)
 	foreach.Client_scatter(dial, fmtr, "localhost", port, p, K, 1)
+
 	wg.Wait()
 }

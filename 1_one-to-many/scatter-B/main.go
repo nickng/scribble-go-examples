@@ -24,12 +24,13 @@ func init() {
 
 func main() {
 	listen, _, fmtr, port, K := scributil.ParseFlags()
+	wg := new(sync.WaitGroup)
+	wg.Add(K)
 
 	p := Scatter.New()  // FIXME: K should be param here?
-	wg := new(sync.WaitGroup)
-	wg.Add(2)
 	for i := 1; i <= K; i++ {
 		go scatter.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}
+
 	wg.Wait()
 }

@@ -28,7 +28,7 @@ func main() {
 
 	p := Scatter.New()  // FIXME: K should be param here?
 	wg := new(sync.WaitGroup)
-	wg.Add(2)
+	wg.Add(K)
 	for i := 1; i <= K; i++ {
 		go scatter.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}

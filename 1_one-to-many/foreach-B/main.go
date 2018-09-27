@@ -23,12 +23,13 @@ func init() {
 
 func main() {
 	listen, _, fmtr, port, K := scributil.ParseFlags()
-
-	p := Foreach.New()  // FIXME: K should be param here?
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
+
+	p := Foreach.New()  // FIXME: K should be param here?
 	for i := 1; i <= K; i++ {
 		go foreach.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}
+
 	wg.Wait()
 }
