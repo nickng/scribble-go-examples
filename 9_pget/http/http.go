@@ -2,9 +2,11 @@ package http
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2"
@@ -53,6 +55,8 @@ func (Response) GetOp() string {
 	return "http.Response"
 }
 
+var debug = os.Getenv("DEBUG") == "1"
+
 // Formatter is a custom formatter for HTTP requests and responses.
 type Formatter struct {
 	c transport2.BinChannel
@@ -69,7 +73,14 @@ func (f *Formatter) Serialize(m session2.ScribMessage) error {
 	case *HeadReq:
 		req, err := http.NewRequest(http.MethodHead, m.url, nil)
 		if err != nil {
-			return fmt.Errorf("cannot create GET request: %v", err)
+			return fmt.Errorf("cannot create HEAD request: %v", err)
+		}
+		if debug {
+			buf := new(bytes.Buffer)
+			req.Write(buf)
+			log.Println("---- start HTTP debug ---")
+			fmt.Fprintf(os.Stderr, buf.String())
+			log.Println("---- end HTTP debug ---")
 		}
 		return req.Write(f.c)
 	case *GetReq:
@@ -79,6 +90,13 @@ func (f *Formatter) Serialize(m session2.ScribMessage) error {
 		}
 		if m.from < m.to {
 			req.Header.Add("Range", fmt.Sprintf("bytes=%d-%d", m.from, m.to))
+		}
+		if debug {
+			buf := new(bytes.Buffer)
+			req.Write(buf)
+			log.Println("---- start HTTP debug ---")
+			fmt.Fprintf(os.Stderr, buf.String())
+			log.Println("---- end HTTP debug ---")
 		}
 		return req.Write(f.c)
 	}
@@ -91,13 +109,10 @@ func (f *Formatter) Deserialize(m *session2.ScribMessage) error {
 	if err != nil {
 		return err
 	}
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return fmt.Errorf("cannot read HTTP response: %v", err)
-	}
+	b := make([]byte, res.ContentLength)
 	if err := res.Body.Close(); err != nil {
 		return fmt.Errorf("cannot close HTTP response body: %v", err)
 	}
-	*m = Response{Body: b, Header: res.Header}
+	*m = &Response{Body: b, Header: res.Header}
 	return nil
 }

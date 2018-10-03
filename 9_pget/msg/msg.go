@@ -3,6 +3,7 @@ package msg
 // Meta represents metadata retrieved from server.
 // Contains full Size of the file to retrieve.
 type Meta struct {
+	URL  string
 	Size int
 }
 
