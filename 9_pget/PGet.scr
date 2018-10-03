@@ -21,11 +21,11 @@ global protocol Basic(role M, role F, role S) {
   Res from S[1] to F[1,K];
   Data from F[1,K] to M[1];
 
-  (Sync@A) from F[1,K] to M[1];
+  Sync(Sync@A) from F[1,K] to M[1];
 }
 
 global protocol Sync(role A, role B) {
-  Done from A to B;
+  Done from A[1] to B[1];
 }
 
 global protocol Foreach(role M, role F, role S) {
@@ -41,5 +41,5 @@ global protocol Foreach(role M, role F, role S) {
     Res from S[1] to F[I];
   }
   Data from F[1,K] to M[1];
-  (Sync@A) from F[1,K] to M[1];
+  Sync(Sync@A) from F[1,K] to M[1];
 }
