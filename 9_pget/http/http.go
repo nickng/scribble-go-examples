@@ -16,12 +16,12 @@ type HeadReq struct {
 }
 
 // Head creates and wraps a new HTTP HEAD request.
-func Head(url string) *HeadReq {
-	return &HeadReq{url}
+func Head(url string) HeadReq {
+	return HeadReq{url}
 }
 
 // GetOp returns a dummy HeadReq label.
-func (*HeadReq) GetOp() string {
+func (HeadReq) GetOp() string {
 	return "http.HeadReq"
 }
 
@@ -32,23 +32,24 @@ type GetReq struct {
 }
 
 // Get creates and wraps a new HTTP GET request.
-func Get(url string, from, to int) *GetReq {
-	return &GetReq{url, from, to}
+func Get(url string, from, to int) GetReq {
+	return GetReq{url, from, to}
 }
 
 // GetOp returns a dummy GetReq label.
-func (*GetReq) GetOp() string {
+func (GetReq) GetOp() string {
 	return "http.GetReq"
 }
 
 // Response is a Scribble HTTP response wrapper.
 // The body of the response is stored in the Body field.
 type Response struct {
-	Body []byte
+	Body   []byte
+	Header http.Header
 }
 
 // GetOp returns a dummy Response label.
-func (*Response) GetOp() string {
+func (Response) GetOp() string {
 	return "http.Response"
 }
 
@@ -97,6 +98,6 @@ func (f *Formatter) Deserialize(m *session2.ScribMessage) error {
 	if err := res.Body.Close(); err != nil {
 		return fmt.Errorf("cannot close HTTP response body: %v", err)
 	}
-	*m = &Response{Body: b}
+	*m = Response{Body: b, Header: res.Header}
 	return nil
 }
