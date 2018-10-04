@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -59,7 +60,8 @@ var debug = os.Getenv("DEBUG") == "1"
 
 // Formatter is a custom formatter for HTTP requests and responses.
 type Formatter struct {
-	c transport2.BinChannel
+	c         transport2.BinChannel
+	emptyBody bool
 }
 
 // Wrap wraps a binary channel for encoding/decoding.
@@ -82,6 +84,7 @@ func (f *Formatter) Serialize(m session2.ScribMessage) error {
 			fmt.Fprintf(os.Stderr, buf.String())
 			log.Println("---- end HTTP debug ---")
 		}
+		f.emptyBody = true // set HEAD request flag
 		return req.Write(f.c)
 	case *GetReq:
 		req, err := http.NewRequest(http.MethodGet, m.url, nil)
@@ -109,7 +112,22 @@ func (f *Formatter) Deserialize(m *session2.ScribMessage) error {
 	if err != nil {
 		return err
 	}
-	b := make([]byte, res.ContentLength)
+	if debug {
+		log.Println("---- start HTTP debug ---")
+		for k, v := range res.Header {
+			fmt.Fprintf(os.Stderr, "  %s = %s\n", k, v)
+		}
+		log.Println("---- end HTTP debug ---")
+	}
+	if f.emptyBody {
+		*m = &Response{Header: res.Header}
+		f.emptyBody = false // unset HEAD request flag
+		return nil
+	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("cannot read HTTP response body: %v", err)
+	}
 	if err := res.Body.Close(); err != nil {
 		return fmt.Errorf("cannot close HTTP response body: %v", err)
 	}
