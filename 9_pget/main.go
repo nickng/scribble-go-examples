@@ -176,7 +176,9 @@ func M(s *M_1to1.Init) M_1to1.End {
 
 	for i := range data {
 		debugf("Received from F[%d] %d bytes\n", i, len(data[i].Data))
+		debugf("(%d)--------------------", i)
 		fmt.Print(string(data[i].Data))
+		debugf("--------------------(%d)", i)
 	}
 	fmt.Println()
 
