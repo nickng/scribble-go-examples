@@ -4,7 +4,9 @@ package scributil
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2"
@@ -103,6 +105,7 @@ func ParseFlags() (cparam ConnParam, K int) {
 	flag.IntVar(&param, "K", 2, "K parameter value")
 	flag.Parse()
 
+	Debugf("[info] Transport selected: %s\n", tran)
 	switch tran {
 	case tcpTran:
 		return newTcpConn(port, param), param
@@ -112,4 +115,11 @@ func ParseFlags() (cparam ConnParam, K int) {
 		log.Fatalf("unrecognised transport: %s", tran)
 	}
 	return nil, param
+}
+
+// Debugf prints a message if debug mode is on.
+func Debugf(format string, args ...interface{}) {
+	if os.Getenv("DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, format, args...)
+	}
 }
