@@ -24,7 +24,8 @@ func Server_gather(p *Scatter.Scatter, K int, self int, sc scributil.ServerConn,
 	}
 	B.Run(func(s *B_1toK.Init) B_1toK.End {
 		d := make([]messages.Data, 1)
-		end := s.A_1_Gather_Data(d) // CHECKME: check values correct?
+		end := s.A_1_Gather_Data(d)
+		scributil.Debugf("B[%d]: received %v.\n", self, d)
 		return *end
 	})
 	wg.Done()
@@ -43,6 +44,7 @@ func Client_scatter(p *Scatter.Scatter, K int, self int, cc scributil.ClientConn
 			d = append(d, messages.Data{V: i})
 		}
 		end := s.B_1toK_Scatter_Data(d)
+		scributil.Debugf("A[%d]: sent %v\n", self, d)
 		return *end
 	})
 }

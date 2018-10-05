@@ -25,25 +25,28 @@ func Server_gather(p *Foreach.Foreach, K int, self int, sc scributil.ServerConn,
 	B.Run(func(s *B_1toK.Init) B_1toK.End {
 		d := make([]messages.Data, 1)
 		end := s.A_1_Gather_Data(d)
+		scributil.Debugf("B[%d]: received %v.\n", self, d)
 		return *end
 	})
 	wg.Done()
 }
 
 func Client_scatter(p *Foreach.Foreach, K int, self int, cc scributil.ClientConn, host string, port int) {
-	A := p.New_A_1to1(K, 1)
+	A := p.New_A_1to1(K, self)
 	for i := 1; i <= K; i++ {
 		if err := A.B_1toK_Dial(i, host, port+i, cc.Dial, cc.Formatter()); err != nil { // FIXME: nil pointer error if no server
 			log.Fatal(err)
 		}
 	}
+	var d []messages.Data
+	for i := 1; i <= K; i++ {
+		d = append(d, messages.Data{V: i})
+	}
 	A.Run(func(s *A_1to1.Init) A_1to1.End {
-		var d []messages.Data
-		for i := 1; i <= K; i++ {
-			d = append(d, messages.Data{V: i})
-		}
-		end := s.Foreach(func(s *A_1to1.Init_11) A_1to1.End {
+		scributil.Debugf("A: sent %v.\n", d)
+		end := s.Foreach(func(s *A_1to1.Init_7) A_1to1.End {
 			end := s.B_I_Scatter_Data(d)
+			d = d[1:]
 			return *end
 		})
 		return *end
