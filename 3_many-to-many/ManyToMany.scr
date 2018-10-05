@@ -5,8 +5,8 @@ module ManyToMany;
 sig <go> "message.Data" from "github.com/nickng/scribble-go-examples/3_many-to-many/message" as Data;
 
 // AllToAll is the many-to-many pattern.
-global protocol AllToAll(role A, role B) {
-  Data from A[M,M] to B[N,N];
+global protocol Alltoall(role A, role B) {
+  Data from A[1,M] to B[1,N];
 }
 
 // Foreach is the foreach-based many-to-many pattern.
