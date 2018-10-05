@@ -3,6 +3,7 @@
 package foreach
 
 import (
+	"encoding/gob"
 	"log"
 	"sync"
 
@@ -12,6 +13,10 @@ import (
 	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
+
+func init() {
+	gob.Register(new(messages.Data))
+}
 
 func Server_gather(p *Foreach.Foreach, K int, self int, sc scributil.ServerConn, port int, wg *sync.WaitGroup) {
 	ss, err := sc.Listen(port)
