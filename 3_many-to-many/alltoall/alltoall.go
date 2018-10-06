@@ -22,7 +22,7 @@ func init() {
 
 // A implements A[1]...A[M]
 func A(p *Alltoall.Alltoall, M, N, selfM int, cc scributil.ClientConn, host string, port int, wg *sync.WaitGroup) {
-	A := p.New_A_1toM(N, M, selfM)
+	A := p.New_A_1toM(M, N, selfM)
 
 	wgCli := new(sync.WaitGroup)
 	wgCli.Add(N)
@@ -44,7 +44,7 @@ func A(p *Alltoall.Alltoall, M, N, selfM int, cc scributil.ClientConn, host stri
 			d = append(d, message.Data{V: selfM})
 		}
 		sEnd := s.B_1toN_Scatter_Data(d)
-		scributil.Debugf("A[%d] sent %v.\n", selfM, d)
+		scributil.Debugf("A[%d]: sent %v.\n", selfM, d)
 		return *sEnd
 	})
 	wg.Done()
