@@ -1,0 +1,26 @@
+module Auction;
+
+// Vickrey Auction between Auctioneer and k Bidders
+
+sig <go> "message.Initial" from "github.com/nickng/scribble-go-examples/10_auction/message" as InitialBid;
+sig <go> "message.Highest" from "github.com/nickng/scribble-go-examples/10_auction/message" as HighestBid;
+sig <go> "message.BidOrSkip" from "github.com/nickng/scribble-go-examples/10_auction/message" as BidOrSkip;
+sig <go> "message.Winner" from "github.com/nickng/scribble-go-examples/10_auction/message" as Winner;
+
+global protocol Protocol(role Auctioneer, role Bidder) {
+  InitialBid from Bidder[1,K] to Auctioneer[1];
+  HighestBid from Auctioneer[1] to Bidder[1,K];
+  do Bids(Auctioneer, Bidder);
+}
+
+aux global protocol Bids(role Auctioneer, role Bidder) {
+  foreach Bidder[I:1,K] {
+    BidOrSkip from Bidder[I] to Auctioneer[1];
+  }
+  choice at Auctioneer[1] {
+    HighestBid from Auctioneer[1] to Bidder[1,K];
+    do Bids(Auctioneer, Bidder);
+  } or {
+    Winner from Auctioneer[1] to Bidder[1,K];
+  }
+}
