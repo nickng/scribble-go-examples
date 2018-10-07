@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh -d ../ ../PGet.scr -param Basic github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
+//go:generate scribblec-param.sh -d ../ ../PGet.scr -param Foreach github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
 //go:generate scribblec-param.sh -d ../ ../PGet.scr -param Sync github.com/nickng/scribble-go-examples/9_pget/PGet -param-api A -param-api B
 
 package main
@@ -10,10 +10,10 @@ import (
 	"os"
 	"sync"
 
-	"github.com/nickng/scribble-go-examples/9_pget/PGet/Basic"
-	"github.com/nickng/scribble-go-examples/9_pget/PGet/Basic/family_1/F_1to1and1toK"
-	"github.com/nickng/scribble-go-examples/9_pget/PGet/Basic/family_1/F_1toK_not_1to1"
-	"github.com/nickng/scribble-go-examples/9_pget/PGet/Basic/family_1/M_1to1"
+	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach"
+	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach/family_1/F_1to1and1toK"
+	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach/family_1/F_1toK_not_1to1"
+	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach/family_1/M_1to1"
 	"github.com/nickng/scribble-go-examples/9_pget/PGet/Sync"
 	"github.com/nickng/scribble-go-examples/9_pget/PGet/Sync/A_1to1"
 	"github.com/nickng/scribble-go-examples/9_pget/PGet/Sync/B_1to1"
@@ -53,13 +53,13 @@ func main() {
 	URL = flag.Arg(0)
 	httpHost, httpPort := pget.ParseURL(URL)
 
-	p := Basic.New()
+	p := Foreach.New()
 	M := p.New_family_1_M_1to1(K, 1) // Master M[1]
 
 	F1 := p.New_family_1_F_1to1and1toK(K, 1)               // Fetcher F[1]
 	F2toK := make([]*F_1toK_not_1to1.F_1toK_not_1to1, K-1) // Fetcher F[2,K]
 	for i := 2; i <= K; i++ {
-		F2toK[i-2] = p.New_family_1_F_1toK_not_1to1(K, 1)
+		F2toK[i-2] = p.New_family_1_F_1toK_not_1to1(K, i)
 	}
 	FListeners := make([]transport2.ScribListener, K)
 	var err error
