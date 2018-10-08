@@ -1,0 +1,67 @@
+module QuoteRequest;
+
+//
+// Quote-Request protocol specification
+// (C-UC-002 from W3C Web Service Choreography Working Group)
+//
+// Adapted from Pabble protocol specified from
+//   Pabble: Parameterised Scribble
+//    by Nicholas Ng and Nobuko Yoshida in SOCA (2014)
+//
+
+sig <go> "message.QuoteReq" from "github.com/nickng/scribble-go-examples/11_quote-request/message" as QuoteReq;
+type <go> "message.Quote" from "github.com/nickng/scribble-go-examples/11_quote-request/message" as Quote;
+
+global protocol WebService(role Buyer, role Supplier, role Manufacturer) {
+  // (1) Buyer requests quote from Suppliers.
+  QuoteReq from Buyer[1] to Supplier[1,S];
+  do Negotiate(Buyer, Supplier, Manufacturer);
+}
+
+aux global protocol Negotiate(role Buyer, role Supplier, role Manufacturer) {
+  // (2) All Suppliers forward quote request to their Manufacturers.
+  QuoteReq from Supplier[1,S] to Manufacturer[1,M];
+  Reply(Quote) from Manufacturer[1,M] to Supplier[1,S];
+  // (3) Suppliers build quote for the Buyer,
+  //     which is then sent back to the Buyer.
+  Reply(Quote) from Supplier[1,S] to Buyer[1];
+  do MakeDeal(Buyer, Supplier, Manufacturer);
+}
+
+aux global protocol MakeDeal(role Buyer, role Supplier, role Manufacturer) {
+  choice at Buyer[1] {
+    // (4a) Either the Buyer agrees to the quote and place order.
+    Order(Quote) from Buyer[1] to Supplier[1,S];
+    Finish() from Supplier[1] to Manufacturer[1,M];
+  } or {
+    // (4b) Or the Buyer modify the quote and send back to Suppliers.
+    Modify(Quote) from Buyer[1] to Supplier[1,S];
+
+    // (5) Supplier received updated quote
+    choice at Supplier[1] {
+      // (5a) Either Supplier respond by agreeing to it and sending a confirmation
+      Confirm() from Supplier[1] to Buyer[1];
+      Finish() from Supplier[1] to Manufacturer[1,M];
+      Finish() from Supplier[1] to Supplier[2,S];
+    } or {
+      // (5b) Or Supplier modify it and sending it back to Buyer.
+      //      Buyer goes back to (4)
+      Modify(Quote) from Supplier[1] to Buyer[1];
+      Finish() from Supplier[1] to Manufacturer[1,M];
+      Modify(Quote) from Supplier[1] to Supplier[2,S];
+      do MakeDeal(Buyer, Supplier, Manufacturer);
+    } or {
+      // (5c) Or Supplier reject updated quote.
+      Reject() from Supplier[1] to Buyer[1];
+      Finish() from Supplier[1] to Manufacturer[1,M];
+      Finish() from Supplier[1] to Supplier[2,S];
+    } or {
+      // (5d) Or Supplier renegotiate with the Manufacturers
+      //      going back to (3)
+      Renegotiate() from Supplier[1] to Buyer[1];
+      Renegotiate() from Supplier[1] to Manufacturer[1,M];
+      Renegotiate() from Supplier[1] to Supplier[2,S];
+      do Negotiate(Buyer, Supplier, Manufacturer);
+    }
+  }
+}
