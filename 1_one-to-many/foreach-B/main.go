@@ -1,48 +1,35 @@
+//rhu@HZHL4 ~/code/go
+//$ go install github.com/nickng/scribble-go-examples/1_one-to-many/foreach-B
+//$ bin/foreach-B.exe
+
 //go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Foreach github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api B -param-api A
 
 package main
 
 import (
 	"encoding/gob"
-	"log"
 	"sync"
 
+	"github.com/nickng/scribble-go-examples/scributil"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach/B_1toK"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
-	"github.com/rhu1/scribble-go-runtime/runtime/session2"
-	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/foreach"
 )
 
-const k = 2
-
 func init() {
-	var data onetomany.Data
+	var data messages.Data
 	gob.Register(&data)
 }
 
 func main() {
-	s := Foreach.New()
+	listen, _, fmtr, port, K := scributil.ParseFlags()
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
-	go gather(s, 1, wg)
-	go gather(s, 2, wg)
-	wg.Wait()
-}
 
-func gather(s *Foreach.Foreach, id int, wg *sync.WaitGroup) {
-	ln, err := tcp.Listen(3333 + id - 1)
-	if err != nil {
-		log.Fatalf("Cannot listen: %v", err)
+	p := Foreach.New()  // FIXME: K should be param here?
+	for i := 1; i <= K; i++ {
+		go foreach.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}
-	B := s.New_B_1toK(k, id)
-	if err := B.A_1to1_Accept(1, ln, new(session2.GobFormatter)); err != nil {
-		log.Fatal(err)
-	}
-	B.Run(func(s *B_1toK.Init_12) B_1toK.End {
-		d := make([]onetomany.Data, 1)
-		end := s.A_1to1_Gather_Data(d)
-		return *end
-	})
-	wg.Done()
+
+	wg.Wait()
 }

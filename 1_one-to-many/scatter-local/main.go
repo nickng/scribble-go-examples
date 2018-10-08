@@ -1,6 +1,6 @@
 //rhu@HZHL4 ~/code/go
-//$ go install github.com/nickng/scribble-go-examples/1_one-to-many/scatter-B
-//$ bin/scatter-B.exe
+//$ go install github.com/nickng/scribble-go-examples/1_one-to-many/scatter-local
+//$ bin/scatter-local.exe -t=shm
 
 //go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 
@@ -10,10 +10,11 @@ package main
 import (
 	"encoding/gob"
 	"sync"
+	"time"
 
 	"github.com/nickng/scribble-go-examples/scributil"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/scatter"
 )
 
@@ -23,14 +24,15 @@ func init() {
 }
 
 func main() {
-	listen, _, fmtr, port, K := scributil.ParseFlags()
-	wg := new(sync.WaitGroup)
-	wg.Add(K)
+	listen, dial, fmtr, port, K := scributil.ParseFlags()
 
 	p := Scatter.New()  // FIXME: K should be param here?
+	wg := new(sync.WaitGroup)
+	wg.Add(K)
 	for i := 1; i <= K; i++ {
 		go scatter.Server_gather(listen, fmtr, port+i, p, K, i, wg)
 	}
-
+	time.Sleep(100 * time.Millisecond)
+	scatter.Client_scatter(dial, fmtr, "localhost", port, p, K, 1)
 	wg.Wait()
 }

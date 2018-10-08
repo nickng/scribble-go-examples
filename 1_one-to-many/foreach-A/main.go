@@ -1,41 +1,28 @@
+//rhu@HZHL4 ~/code/go
+//$ go install github.com/nickng/scribble-go-examples/1_one-to-many/foreach-A
+//$ bin/foreach-A.exe
+
 //go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Foreach github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 
 package main
 
 import (
 	"encoding/gob"
-	"log"
 
+	"github.com/nickng/scribble-go-examples/scributil"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach/A_1to1"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/onetomany"
-	"github.com/rhu1/scribble-go-runtime/runtime/session2"
-	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
+	"github.com/nickng/scribble-go-examples/1_one-to-many/foreach"
 )
 
-const k = 2
-
 func init() {
-	var data onetomany.Data
+	var data messages.Data
 	gob.Register(&data)
 }
 
 func main() {
-	A := Foreach.New().New_A_1to1(k, 1)
-	for i := 0; i < k; i++ {
-		if err := A.B_1toK_Dial(i+1, "localhost", 3333+i, tcp.Dial, new(session2.GobFormatter)); err != nil {
-			log.Fatal(err)
-		}
-	}
-	A.Run(func(s *A_1to1.Init_8) A_1to1.End {
-		var d []onetomany.Data
-		for i := 0; i < k; i++ {
-			d = append(d, onetomany.Data{V: i})
-		}
-		end := s.Foreach(func(s *A_1to1.Init_6) A_1to1.End {
-			end := s.B_ItoI_Scatter_Data(d)
-			return *end
-		})
-		return *end
-	})
+	_, dial, fmtr, port, K := scributil.ParseFlags()
+
+	p := Foreach.New()
+	foreach.Client_scatter(dial, fmtr, "localhost", port, p, K, 1)
 }
