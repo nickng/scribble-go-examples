@@ -1,12 +1,13 @@
-// Pipeline - the pipeline protocol
-
 module Pipeline;
 
-sig <go> "messages.Val" from "github.com/nickng/scribble-go-examples/4_pipeline/message" as Val;
 
-// Cf. ...?
-global protocol Pipeline(role W) {
-  foreach W[I:1,K-1], W[J:2,K] {
-    Next from W[I] to W[J];
-  }
+sig <go> "messages.Foo" from "github.com/nickng/scribble-go-examples/4_pipeline/messages" as Foo;
+
+
+global protocol Pipeline(role W)
+{
+	foreach W[I:1,K-1], W[J:2,K]
+	{
+		Foo from W[I] to W[J];
+	}
 }
