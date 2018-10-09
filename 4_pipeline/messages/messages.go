@@ -1,9 +1,9 @@
-package message
+package messages
 
-// Val is Val(int) signature.
-type Val struct {
-	V int
+type Foo struct {
+	X int 
 }
 
-// GetOp returns the label.
-func (*Val) GetOp() string { return "Val" }
+func (Foo) GetOp() string {
+	return "Foo"	
+}
