@@ -1,17 +1,28 @@
-// Ring - pipeline with wraparound connection
-
 module Ring;
 
-sig <go> "message.Next" from "github.com/nickng/scribble-go-examples/5_ring/message" as Next;
-sig <go> "message.Done" from "github.com/nickng/scribble-go-examples/5_ring/message" as Done;
+sig <go> "messages.Foo" from "github.com/nickng/scribble-go-examples/5_ring/messages" as Foo;
+sig <go> "messages.Bar" from "github.com/nickng/scribble-go-examples/5_ring/messages" as Bar;
 
-global protocol Ring(role W) {
-  choice at W[1] {
-    Next pipe W[1,K];
-    Next from W[K] to W[1];
-    do Ring(W);
-  } or {
-    Done pipe W[1,K];
-    Done from W[K] to W[1];
-  }
+global protocol RingProto(role W)
+{
+	choice at W[1]
+	{
+		Foo from W[1] to W[2];
+		foreach W[I:2,K-1], W[J:3,K]
+		{
+			Foo from W[I] to W[J];
+		}
+		Foo from W[K] to W[1];
+		do RingProto(W);
+	}
+	or
+	{
+		Bar from W[1] to W[2];
+		foreach W[I:2,K-1], W[J:3,K]
+		{
+			Bar from W[I] to W[J];
+		}
+		Bar from W[K] to W[1];
+	}
 }
+
