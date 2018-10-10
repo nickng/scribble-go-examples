@@ -1,0 +1,24 @@
+module NBuyers;
+
+type <go> "string" from "builtin" as string;
+type <go> "int" from "builtin" as int;
+
+sig <go> "message.Address" from "github.com/nickng/scribble-go-examples/21_nbuyers/message" as Address;
+sig <go> "message.Date" from "github.com/nickng/scribble-go-examples/21_nbuyers/message" as Date;
+
+global protocol NBuyers(role Seller, role Buyer) {
+  Title(string) from Buyer[1] to Seller[1];
+  Quote(int) from Seller[1] to Buyer[1,K];
+
+  foreach Buyer[I:1,K-1], Buyer[J:2,K] {
+    Quote(int) from Buyer[I] to Buyer[J];
+  }
+
+  choice at Buyer[K] {
+    OK() from Buyer[K] to Seller[1];
+    Address from Buyer[K] to Seller[1];
+    Date from Seller[1] to Buyer[K];
+  } or {
+    Quit() from Buyer[K] to Seller[1];
+  }
+}
