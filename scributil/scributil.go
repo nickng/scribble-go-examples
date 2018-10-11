@@ -4,6 +4,7 @@ package scributil
 
 import (
 	"flag"
+	"time"
 	"fmt"
 	"log"
 	"os"
@@ -123,5 +124,12 @@ func ParseFlags() (cparam ConnParam, K int, I int) {
 func Debugf(format string, args ...interface{}) {
 	if os.Getenv("DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, format, args...)
+	}
+}
+
+// Delay if DEBUG=1
+func Delay(d time.Duration) {
+	if os.Getenv("DEBUG") == "1" {
+		time.Sleep(d * time.Millisecond)
 	}
 }
