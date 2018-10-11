@@ -6,6 +6,7 @@ package main
 
 import (
 	"sync"
+	"flag"
 
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/scatter"
@@ -13,7 +14,9 @@ import (
 )
 
 func main() {
-	connAB, K, I := scributil.ParseFlags()
+        var I int
+	flag.IntVar(&I, "I", -1, "self ID (1 <= I <= K)")
+	connAB, K := scributil.ParseFlags()
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 

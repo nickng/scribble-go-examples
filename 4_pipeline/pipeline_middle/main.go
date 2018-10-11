@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"log"
 	"sync"
+	"flag"
 
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
@@ -42,7 +43,9 @@ func init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	_, K, I := scributil.ParseFlags()
+        var I int
+        flag.IntVar(&I, "I", -1, "self ID (2 <= I <= K)")
+	_, K := scributil.ParseFlags()
 
 
 	wg := new(sync.WaitGroup)

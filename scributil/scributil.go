@@ -90,7 +90,7 @@ type ClientConn interface {
 
 // ParseFlags parses command line flags and returns
 // a connection parameter object.
-func ParseFlags() (cparam ConnParam, K int, I int) {
+func ParseFlags() (cparam ConnParam, K int) {
 	const (
 		tcpTran     = "tcp"
 		shmTran     = "shm"
@@ -100,24 +100,22 @@ func ParseFlags() (cparam ConnParam, K int, I int) {
 		tran  string // transport
 		port  int    // base port
 		param int    // parameter value
-		self  int    // self ID
 	)
 	flag.StringVar(&tran, "t", tcpTran, "transport: tcp/shm")
 	flag.IntVar(&port, "port", defaultPort, "base port for sever sockets")
 	flag.IntVar(&param, "K", 2, "K parameter value")
-	flag.IntVar(&self, "I", 1, "self parameter value")
 	flag.Parse()
 
 	Debugf("[info] Transport selected: %s\n", tran)
 	switch tran {
 	case tcpTran:
-		return newTcpConn(port, param), param, self
+		return newTcpConn(port, param), param
 	case shmTran:
-		return newShmConn(port, param), param, self
+		return newShmConn(port, param), param
 	default:
 		log.Fatalf("unrecognised transport: %s", tran)
 	}
-	return nil, param, self
+	return nil, param
 }
 
 // Debugf prints a message if debug mode is on.

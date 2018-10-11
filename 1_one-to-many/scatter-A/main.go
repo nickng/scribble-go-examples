@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	connAB, K, _ := scributil.ParseFlags()
+	connAB, K := scributil.ParseFlags()
 
 	p := Scatter.New()
 	scatter.Client_scatter(p, K, 1, connAB, "localhost", connAB.BasePort())

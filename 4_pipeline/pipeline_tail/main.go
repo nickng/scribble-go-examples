@@ -42,7 +42,7 @@ func init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	_, K, _ := scributil.ParseFlags()
+	_, K := scributil.ParseFlags()
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

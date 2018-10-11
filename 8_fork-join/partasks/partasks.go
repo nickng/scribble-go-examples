@@ -75,7 +75,7 @@ func Worker(p *Protocol.Protocol, K, self int, sc scributil.ServerConn, port int
 		scributil.Delay(1500)
 		sEnd := s0.Master_1_Scatter_Red(r)
 		scributil.Debugf("Worker[%d]: sent %v.\n", self, r)
-		scributil.Debugf("Worker[%d]: finished.\n")
+		scributil.Debugf("Worker[%d]: finished.\n", self)
 		return *sEnd
 	})
 	wg.Done()
