@@ -18,7 +18,7 @@ Ept *B_1toN
 }
 
 
-func (s *Init) A_1to1_Gather_Int(arg0 []message.Int) *End {
+func (s *Init) A_1_Gather_Int(arg0 []message.Int) *End {
 if s.Err != nil {
 panic(s.Err)
 }

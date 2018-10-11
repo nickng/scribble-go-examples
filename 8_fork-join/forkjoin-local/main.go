@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	connMW, K := scributil.ParseFlags()
+	connMW, K, _ := scributil.ParseFlags()
 	protocol := Protocol.New()
 
 	wg := new(sync.WaitGroup)

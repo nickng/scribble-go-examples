@@ -1,5 +1,5 @@
-//go:generate scribblec-param.sh ../Pipeline.scr -d ../ -param Pipeline github.com/nickng/scribble-go-examples/4_pipeline/Pipeline -param-api W
-package pipeline 
+//go:generate scribblec-param.sh ../../Pipeline.scr -d ../../ -param Pipeline github.com/nickng/scribble-go-examples/4_pipeline/Pipeline -param-api W
+package pipeline
 
 import (
 	"encoding/gob"
@@ -18,6 +18,7 @@ import (
 	Head "github.com/nickng/scribble-go-examples/4_pipeline/Pipeline/Pipeline/family_1/W_1toKsub1_not_2toK"
 	Middle "github.com/nickng/scribble-go-examples/4_pipeline/Pipeline/Pipeline/family_1/W_1toKsub1and2toK"
 	Tail "github.com/nickng/scribble-go-examples/4_pipeline/Pipeline/Pipeline/family_1/W_2toK_not_1toKsub1"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
 var _ = shm.Dial
@@ -68,8 +69,10 @@ func Server_tail(wg *sync.WaitGroup, K int, self int) *Tail.End {
 
 func runTail(s *Tail.Init) Tail.End {
 	pay := make([]messages.Foo, 1)
+	scributil.Delay(1500)
 	end := s.W_selfsub1_Gather_Foo(pay)
-	fmt.Println("Tail (" + strconv.Itoa(s.Ept.Self) + ") gathered:", pay)
+	fmt.Println("Tail (" + strconv.Itoa(s.Ept.Self) + ") received:", pay)
+	fmt.Println("Tail (" + strconv.Itoa(s.Ept.Self) + ") finished")
 	return *end
 }
 
@@ -98,10 +101,12 @@ func Server_middle(wg *sync.WaitGroup, K int, self int) *Middle.End {
 func runMiddle(s *Middle.Init) Middle.End {
 	pay := make([]messages.Foo, 1)
 	s2 := s.W_selfsub1_Gather_Foo(pay)
-	fmt.Println("Middle (" + strconv.Itoa(s.Ept.Self) + ") gathered:", pay)
+	fmt.Println("Middle (" + strconv.Itoa(s.Ept.Self) + ") received:", pay)
 	pay = []messages.Foo{messages.Foo{s.Ept.Self}}
+	scributil.Delay(1500)
 	end := s2.W_selfplus1_Scatter_Foo(pay)
-	fmt.Println("Middle (" + strconv.Itoa(s.Ept.Self) + ") scattered Foo:", pay)
+	fmt.Println("Middle (" + strconv.Itoa(s.Ept.Self) + ") sent Foo:", pay)
+	fmt.Println("Middle (" + strconv.Itoa(s.Ept.Self) + ") finished")
 	return *end
 }
 
@@ -122,7 +127,9 @@ func Client_head(wg *sync.WaitGroup, K int, self int) *Head.End {
 
 func runHead(s *Head.Init) Head.End {
 	pay := []messages.Foo{messages.Foo{s.Ept.Self}}
+	scributil.Delay(1500)
 	end := s.W_selfplus1_Scatter_Foo(pay)
-	fmt.Println("Head (" + strconv.Itoa(s.Ept.Self) + ") scattered Foo:", pay)
+	fmt.Println("Head (" + strconv.Itoa(s.Ept.Self) + ") sent Foo:", pay)
+	fmt.Println("Head (" + strconv.Itoa(s.Ept.Self) + ") finished")
 	return *end
 }

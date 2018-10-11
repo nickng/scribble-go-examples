@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../Ring.scr -d .. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
+//go:generate scribblec-param.sh ../../Ring.scr -d ../.. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
 package ring
 
 import (
@@ -22,6 +22,7 @@ import (
 	M "github.com/nickng/scribble-go-examples/5_ring/Ring/RingProto/family_2/W_2toKsub1and3toK_not_1to1and2to2andKtoK"
 	WK "github.com/nickng/scribble-go-examples/5_ring/Ring/RingProto/family_2/W_3toKandKtoK_not_1to1and2to2and2toKsub1"
 	"github.com/nickng/scribble-go-examples/5_ring/messages"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
 var _ = shm.Dial
@@ -74,25 +75,30 @@ func Ring_last(wg *sync.WaitGroup, K int, self int) *WK.End {
 func runWK(s *WK.Init) WK.End {
 	var end *WK.End
 	switch c := s.W_selfsub1_Branch().(type) {
-	case *WK.Foo_W_Init:
+	case *WK.Foo:
 		var x messages.Foo
 		s2 := c.Recv_Foo(&x)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") received Foo:", x)
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
+                scributil.Delay(1500)
 		s = s2.W_1_Scatter_Foo(pay)
-		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") scattered Foo:", pay)
+		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
 		return runWK(s)
-	case *WK.Bar_W_Init:
+	case *WK.Bar:
 		var x messages.Bar
 		s3 := c.Recv_Bar(&x)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") received Bar:", x)
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
+                scributil.Delay(1500)
 		end = s3.W_1_Scatter_Bar(pay)
-		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") scattered Foo:", pay)
+		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
+                scributil.Delay(1500)
+		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") finished")
 		return *end
 	default:
 		log.Fatal("Shouldn't get in here: ", reflect.TypeOf(c))
 	}
+	fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") finished")
 	return *end
 }
 
@@ -142,20 +148,25 @@ func runM(s *M.Init) M.End {
 		s2 := c.Recv_Foo(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Foo:", x)
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
+                scributil.Delay(1500)
 		s = s2.W_selfplus1_Scatter_Foo(pay)
-		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") scattered Foo:", pay)
+		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
 		return runM(s)
 	case *M.Bar_W_Init:
 		var x messages.Bar
 		s3 := c.Recv_Bar(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Bar:", x)
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
+                scributil.Delay(1500)
 		end = s3.W_selfplus1_Scatter_Bar(pay)
-		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") scattered Foo:", pay)
+		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
+                scributil.Delay(1500)
+		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") finished")
 		return *end
 	default:
 		log.Fatal("Shouldn't get in here: ", reflect.TypeOf(c))
 	}
+	fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") finished")
 	return *end
 }
 
@@ -191,18 +202,22 @@ func runW1(s *W1.Init) W1.End {
 	//var end *W1.End
 	if rnd.Intn(2) < 1 {
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
+                scributil.Delay(1500)
 		s2 := s.W_2_Scatter_Foo(pay)
-		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") scattered Foo #"+strconv.Itoa(count)+":", pay)
+		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") sent Foo #"+strconv.Itoa(count)+":", pay)
 		s = s2.W_K_Gather_Foo(pay)
-		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") gathered:", pay)
+		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") received:", pay)
 		count = count + 1
 		return runW1(s)
 	} else {
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
+                scributil.Delay(1500)
 		s3 := s.W_2_Scatter_Bar(pay)
-		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") scattered Bar:", pay)
+		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") sent Bar:", pay)
 		end := s3.W_K_Gather_Bar(pay)
-		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") gathered:", pay)
+		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") received:", pay)
+                scributil.Delay(1500)
+		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") finished")
 		return *end
 	}
 }

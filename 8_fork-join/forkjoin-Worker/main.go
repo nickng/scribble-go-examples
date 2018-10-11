@@ -9,13 +9,11 @@ import (
 )
 
 func main() {
-	connMW, K := scributil.ParseFlags()
+	connMW, K, I := scributil.ParseFlags()
 	protocol := Protocol.New()
 
 	wg := new(sync.WaitGroup)
-	wg.Add(K)
-	for k := 1; k <= K; k++ {
-		go partasks.Worker(protocol, K, k, connMW, connMW.Port(k), wg)
-	}
+	wg.Add(1)
+	partasks.Worker(protocol, K, I, connMW, connMW.Port(I), wg)
 	wg.Wait()
 }

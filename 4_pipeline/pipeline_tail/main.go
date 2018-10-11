@@ -10,7 +10,8 @@ import (
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 
 	"github.com/nickng/scribble-go-examples/4_pipeline/messages"
-	"github.com/nickng/scribble-go-examples/4_pipeline/pipeline"
+	"github.com/nickng/scribble-go-examples/4_pipeline/internal/pipeline"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
 var _ = shm.Dial
@@ -41,7 +42,7 @@ func init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	K := 4
+	_, K, _ := scributil.ParseFlags()
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

@@ -44,12 +44,14 @@ func Master(p *Protocol.Protocol, K, self int, cc scributil.ClientConn, host str
 		for i := 1; i <= K; i++ {
 			m = append(m, message.Map{V: i})
 		}
+		scributil.Delay(1500)
 		s0 := s.Worker_1toK_Scatter_Map(m)
 		scributil.Debugf("Master: sent %v.\n", m)
 		// collect r
 		r := make([]message.Red, K)
 		sEnd := s0.Worker_1toK_Gather_Red(r)
 		scributil.Debugf("Master: received %v.\n", r)
+		scributil.Debugf("Master: finished.\n")
 		return *sEnd
 	})
 	wg.Done()
@@ -70,8 +72,10 @@ func Worker(p *Protocol.Protocol, K, self int, sc scributil.ServerConn, port int
 		s0 := s.Master_1_Gather_Map(m)
 		scributil.Debugf("Worker[%d]: received %v.\n", self, m)
 		r := []message.Red{message.Red{V: m[0].V}} // build r from d
+		scributil.Delay(1500)
 		sEnd := s0.Master_1_Scatter_Red(r)
 		scributil.Debugf("Worker[%d]: sent %v.\n", self, r)
+		scributil.Debugf("Worker[%d]: finished.\n")
 		return *sEnd
 	})
 	wg.Done()

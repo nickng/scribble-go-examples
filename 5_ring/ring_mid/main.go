@@ -12,6 +12,7 @@ import (
 
 	"github.com/nickng/scribble-go-examples/5_ring/internal/ring"
 	"github.com/nickng/scribble-go-examples/5_ring/messages"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
 var _ = shm.Dial
@@ -40,14 +41,12 @@ func init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	K := 4 // K >= 3
+	 _, K, I := scributil.ParseFlags() // K >= 3, 1 < I <= K-1
 
 	wg := new(sync.WaitGroup)
-	wg.Add(K - 2)
+	wg.Add(1)
 
-	for j := 2; j <= K-1; j++ {
-		go ring.Ring_mid(wg, K, j)
-	}
+	ring.Ring_mid(wg, K, I)
 
 	wg.Wait()
 }
