@@ -13,13 +13,11 @@ import (
 )
 
 func main() {
-	connAB, K := scributil.ParseFlags()
+	connAB, K, I := scributil.ParseFlags()
 	wg := new(sync.WaitGroup)
-	wg.Add(K)
+	wg.Add(1)
 
 	p := Scatter.New() // FIXME: K should be param here?
-	for i := 1; i <= K; i++ {
-		go scatter.Server_gather(p, K, i, connAB, connAB.Port(i), wg)
-	}
+	go scatter.Server_gather(p, K, I, connAB, connAB.Port(I), wg)
 	wg.Wait()
 }

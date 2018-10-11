@@ -3,9 +3,11 @@
 package scatter
 
 import (
+	"os"
 	"encoding/gob"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Scatter/A_1to1"
@@ -48,7 +50,14 @@ func Client_scatter(p *Scatter.Scatter, K int, self int, cc scributil.ClientConn
 		for i := 0; i < K; i++ {
 			d = append(d, messages.Data{V: i})
 		}
+
+		scributil.Debugf("Sending %v\n", d)
+		if os.Getenv("DEBUG") == "1" {
+			time.Sleep(1500 * time.Millisecond)
+        	}
+
 		end := s.B_1toK_Scatter_Data(d)
+
 		scributil.Debugf("A[%d]: sent %v\n", self, d)
 		return *end
 	})
