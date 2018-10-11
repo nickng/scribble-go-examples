@@ -23,6 +23,9 @@ func ParseURL(URL string) (host string, port int) {
 	if host = u.Hostname(); host == "" {
 		log.Fatalf("invalid host: %s", URL)
 	}
+	if u.Scheme == "https" {
+		log.Fatalf("invalid URL: https:// URL not supported")
+	}
 	if port, err = strconv.Atoi(u.Port()); err != nil {
 		port, err = net.LookupPort("tcp", u.Scheme)
 		if err != nil {
