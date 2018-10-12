@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	connAB, K, _ := scributil.ParseFlags()
+	connAB, K := scributil.ParseFlags()
 
 	p := Scatter.New() // FIXME: K should be param here?
 	wg := new(sync.WaitGroup)
