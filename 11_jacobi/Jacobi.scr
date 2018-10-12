@@ -1,0 +1,33 @@
+module Jacobi;
+
+// The Jacobi protocol describes exchange of boundary values
+// between subgrids located on each worker W
+
+sig <go> "message.Dimen" from "github.com/nickng/scribble-go-examples/11_jacobi/message" as Dimen;
+sig <go> "message.Bound" from "github.com/nickng/scribble-go-examples/11_jacobi/message" as Bound;
+sig <go> "message.Converged" from "github.com/nickng/scribble-go-examples/11_jacobi/message" as Converged;
+
+global protocol Jacobi(role W) {
+  // Sends dimension of array to all workers.
+  Dimen from W[1] to W[2];
+  Dimen from W[2] to W[3,K];
+  do Work(W);
+}
+
+aux global protocol Work(role W) {
+  choice at W[1] {
+    Bound from W[1] to W[2];
+    Bound from W[2] to W[1];
+    // Exchange boundary values.
+    foreach W[I:2,K-1], W[J:3,K] {
+      Bound from W[I] to W[J];
+      Bound from W[J] to W[I];
+    }
+    do Work(W);
+  } or {
+    Converged from W[1] to W[2];
+    foreach W[I:2,K-1], W[J:3,K] {
+      Converged from W[I] to W[J];
+    }
+  }
+}
