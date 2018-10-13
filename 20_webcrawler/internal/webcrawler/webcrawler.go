@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../../WebCrawler.scr -d ../../ -param Crawler github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler -param-api Downloader -param-api Parser -param-api Indexer -param-api Master
+//go:generate scribblec-param.sh ../../WebCrawler.scr -d ../../ -param Crawler github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler -param-api Downloader -param-api Parser -param-api Indexer -param-api Master
 
 // Package webcrawler provides the implementation for the WebCrawler protocol.
 //
@@ -14,12 +14,12 @@ import (
 	"log"
 	"sync"
 
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler/Downloader_1toN"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler/Indexer_1to1"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler/Master_1to1"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler/Parser_1toN"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/message"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler/Downloader_1toN"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler/Indexer_1to1"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler/Master_1to1"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler/Parser_1toN"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/message"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
 

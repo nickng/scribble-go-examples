@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nickng/scribble-go-examples/22_webcrawler/WebCrawler/Crawler"
-	"github.com/nickng/scribble-go-examples/22_webcrawler/internal/webcrawler"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/WebCrawler/Crawler"
+	"github.com/nickng/scribble-go-examples/20_webcrawler/internal/webcrawler"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
 
