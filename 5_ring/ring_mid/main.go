@@ -1,4 +1,5 @@
 //go:generate scribblec-param.sh ../Ring.scr -d .. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
+
 package main
 
 import (
