@@ -40,6 +40,7 @@ func W1(p *Jacobi.Jacobi, K, self int, w2 scributil.ClientConn, w2Host string, w
 		nextDimen := make([]message.Dimen, 1)
 		populate(dimen, 1, 1)     // populate subgrid[1]
 		populate(nextDimen, 2, 2) // populate subgrid[2]
+		scributil.Delay(1500)
 		s0 := s.W_2_Scatter_Dimen(nextDimen)
 		var (
 			prevLeft    message.Bound
@@ -50,6 +51,8 @@ func W1(p *Jacobi.Jacobi, K, self int, w2 scributil.ClientConn, w2Host string, w
 		prevLeft, prevRight = initialBounds(dimen[0])
 		for !converged(prevLeft, prevRight) {
 			left, right = calculate(dimen[0], prevLeft, prevRight)
+
+			scributil.Delay(1500)
 			s1 := s0.W_2_Scatter_Bound([]message.Bound{right})
 			scributil.Debugf("W[%d]: sent %v\n", self, right)
 			b := make([]message.Bound, 1)
@@ -59,6 +62,8 @@ func W1(p *Jacobi.Jacobi, K, self int, w2 scributil.ClientConn, w2Host string, w
 			prevLeft = left
 		}
 		conv := []message.Converged{message.Converged{}}
+
+		scributil.Delay(1500)
 		sEnd := s0.W_2_Scatter_Converged(conv)
 		scributil.Debugf("W[%d]: sent %v\n", self, conv)
 		return *sEnd
@@ -110,6 +115,8 @@ func W2(p *Jacobi.Jacobi, K, self int, w1 scributil.ServerConn, w1Port int, wnex
 		s0 := s.W_1_Gather_Dimen(dimen)
 		nextDimen := make([]message.Dimen, K-3+1)
 		populate(nextDimen, 3, K) // populate subgrid[3..K]
+
+		scributil.Delay(1500)
 		s1 := s0.W_3toK_Scatter_Dimen(nextDimen)
 		var (
 			prevLeft    message.Bound
@@ -124,8 +131,12 @@ func W2(p *Jacobi.Jacobi, K, self int, w1 scributil.ServerConn, w1Port int, wnex
 				left, right = calculate(dimen[0], prevLeft, prevRight)
 				s3 := s2.Recv_Bound(&prevLeft)
 				scributil.Debugf("W[%d]: received %v\n", self, prevLeft)
+
+				scributil.Delay(1500)
 				s4 := s3.W_1_Scatter_Bound([]message.Bound{left})
 				scributil.Debugf("W[%d]: sent %v\n", self, left)
+
+				scributil.Delay(1500)
 				s5 := s4.W_3_Scatter_Bound([]message.Bound{right})
 				scributil.Debugf("W[%d]: sent %v\n", self, right)
 				b := make([]message.Bound, 1)
@@ -134,6 +145,7 @@ func W2(p *Jacobi.Jacobi, K, self int, w1 scributil.ServerConn, w1Port int, wnex
 				scributil.Debugf("W[%d]: received %v\n", self, prevRight)
 			case *W_2to2and2toKsub1_not_1to1and3toK.Converged:
 				var conv message.Converged
+				scributil.Delay(1500)
 				sEnd := s2.Recv_Converged(&conv).W_3_Scatter_Converged([]message.Converged{conv})
 				scributil.Debugf("W[%d]: received %v\n", self, conv)
 				scributil.Debugf("W[%d]: sent %v\n", self, conv)
@@ -207,20 +219,25 @@ func Wi(p *Jacobi.Jacobi, K, self int, wprev scributil.ServerConn, wprevPort int
 		prevLeft, prevRight = initialBounds(dimen[0])
 		for {
 			switch s1 := s0.W_selfsub1_Branch().(type) {
-			case *W_2toKsub1and3toK_not_1to1and2to2.Bound_W_State6:
+			case *W_2toKsub1and3toK_not_1to1and2to2.Bound_W_State2:
 				left, right = calculate(dimen[0], prevLeft, prevRight)
 				s2 := s1.Recv_Bound(&prevLeft)
 				scributil.Debugf("W[%d]: received %v\n", self, prevLeft)
+				scributil.Delay(1500)
 				s3 := s2.W_selfsub1_Scatter_Bound([]message.Bound{left})
 				scributil.Debugf("W[%d]: sent %v\n", self, left)
+
+				scributil.Delay(1500)
 				s4 := s3.W_selfplus1_Scatter_Bound([]message.Bound{right})
 				scributil.Debugf("W[%d]: sent %v\n", self, right)
 				b := make([]message.Bound, 1)
 				s0 = s4.W_selfplus1_Gather_Bound(b)
 				prevRight = b[0]
 				scributil.Debugf("W[%d]: received %v\n", self, prevRight)
-			case *W_2toKsub1and3toK_not_1to1and2to2.Converged_W_State6:
+			case *W_2toKsub1and3toK_not_1to1and2to2.Converged_W_State2:
 				var conv message.Converged
+
+				scributil.Delay(1500)
 				sEnd := s1.Recv_Converged(&conv).W_selfplus1_Scatter_Converged([]message.Converged{conv})
 				scributil.Debugf("W[%d]: received %v\n", self, conv)
 				scributil.Debugf("W[%d]: sent %v\n", self, conv)
@@ -279,6 +296,8 @@ func Wk(p *Jacobi.Jacobi, K, self int, wlast scributil.ServerConn, wlastPort int
 				left, right = calculate(dimen[0], prevLeft, prevRight)
 				s2 := s1.Recv_Bound(&prevLeft)
 				scributil.Debugf("W[%d]: received %v\n", self, prevLeft)
+
+				scributil.Delay(1500)
 				s0 = s2.W_selfsub1_Scatter_Bound([]message.Bound{left})
 				scributil.Debugf("W[%d]: sent %v\n", self, left)
 				prevRight = right

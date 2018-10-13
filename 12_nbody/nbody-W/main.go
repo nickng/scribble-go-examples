@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	self := flag.Int("self", 2, "W[i] index (1 < i < K)")
+	self := flag.Int("I", 2, "W[I] index (1 < I < K)")
 	conn, K := scributil.ParseFlags()
 	protocol := NBody.New()
 

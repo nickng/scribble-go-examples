@@ -44,6 +44,7 @@ func W1(p *NBody.NBody, K, self int, w2 scributil.ClientConn, w2Host string, w2P
 	W1.Run(func(s *W_1to1_not_2to2and2toKsub1and3toKandKtoK.Init) W_1to1_not_2to2and2toKsub1and3toKandKtoK.End {
 		for i := 0; i < NIter*K; i++ {
 			rcvd[0].Update = completedLoop(i, K)
+			scributil.Delay(1500)
 			s0 := s.W_2_Scatter_Particles(rcvd)
 			scributil.Debugf("W[%d]: sent %v.\n", self, rcvd)
 			s = s0.W_K_Gather_Particles(rcvd) // overwrite previous received particles
@@ -55,6 +56,7 @@ func W1(p *NBody.NBody, K, self int, w2 scributil.ClientConn, w2Host string, w2P
 			}
 		}
 		stop := []message.Stop{message.Stop{}}
+		scributil.Delay(1500)
 		sEnd := s.W_2_Scatter_Stop(stop)
 		scributil.Debugf("W[%d]: sent %v.\n", self, stop)
 		return *sEnd
@@ -88,8 +90,9 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	Wi.Run(func(s *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Init) W_2to2and2toKsub1_not_1to1and3toKandKtoK.End {
 		for {
 			switch s0 := s.W_1_Branch().(type) {
-			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Particles:
+			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Particles_W_Init:
 				var p message.Particles
+				scributil.Delay(1500)
 				s = s0.Recv_Particles(&p).W_3_Scatter_Particles([]message.Particles{rcvd})
 				scributil.Debugf("W[%d]: received %v.\n", self, p)
 				rcvd = p
@@ -99,8 +102,9 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 					update(particles, velocities)
 					scributil.Debugf("[nbody] W[%d]: update positions.\n", self)
 				}
-			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Stop:
+			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Stop_W_Init:
 				var stop message.Stop
+				scributil.Delay(1500)
 				sEnd := s0.Recv_Stop(&stop).W_3_Scatter_Stop([]message.Stop{stop})
 				//		scributil.Debugf("W[%d]: received %v.\n", self, stop)
 				return *sEnd
@@ -124,7 +128,7 @@ func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	}
 	defer lnPrev.Close()
 	scributil.Debugf("[connection] W[%d]: listening for W[%d] at :%d.\n", self, self-1, wPrevPort)
-	if err := WK.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
+	if err := WK.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
 		log.Fatalf("cannot accept: %v", err)
 	}
 	ln, err := w1.Listen(w1Port)
@@ -141,8 +145,9 @@ func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	WK.Run(func(s *W_3toKandKtoK_not_1to1and2to2and2toKsub1.Init) W_3toKandKtoK_not_1to1and2to2and2toKsub1.End {
 		for {
 			switch s0 := s.W_selfsub1_Branch().(type) {
-			case *W_3toKandKtoK_not_1to1and2to2and2toKsub1.Particles_W_Init:
+			case *W_3toKandKtoK_not_1to1and2to2and2toKsub1.Particles:
 				var p message.Particles
+				scributil.Delay(1500)
 				s = s0.Recv_Particles(&p).W_1_Scatter_Particles([]message.Particles{rcvd})
 				scributil.Debugf("W[%d]: received %v.\n", self, p)
 				rcvd = p
@@ -152,7 +157,7 @@ func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 					update(particles, velocities)
 					scributil.Debugf("[nbody] W[%d]: update positions.\n", self)
 				}
-			case *W_3toKandKtoK_not_1to1and2to2and2toKsub1.Stop_W_Init:
+			case *W_3toKandKtoK_not_1to1and2to2and2toKsub1.Stop:
 				var stop message.Stop
 				sEnd := s0.Recv_Stop(&stop)
 				scributil.Debugf("W[%d]: received %v.\n", self, stop)

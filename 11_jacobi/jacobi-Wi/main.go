@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	self := flag.Int("self", 3, "Specify worker ID")
+	self := flag.Int("I", 3, "Specify worker ID")
 	conn, K := scributil.ParseFlags()
 	protocol := Jacobi.New()
 
