@@ -9,9 +9,9 @@ module WebCrawler;
 // Parser[i] -> Indexer: index;
 // Indexer -> Master: url
 
-sig <go> "message.Parse" from "github.com/nickng/scribble-go-examples/22_webcrawler/message" as Parse;
-sig <go> "message.Index" from "github.com/nickng/scribble-go-examples/22_webcrawler/message" as Index;
-sig <go> "message.URL" from "github.com/nickng/scribble-go-examples/22_webcrawler/message" as URL;
+sig <go> "message.Parse" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as Parse;
+sig <go> "message.Index" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as Index;
+sig <go> "message.URL" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as URL;
 
 global protocol Crawler(role Downloader, role Parser, role Indexer, role Master) {
     foreach Downloader[I:1,N], Parser[J:1,N] {
