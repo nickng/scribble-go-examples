@@ -52,7 +52,7 @@ import (
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto"
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/B_1toK"
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/S_1to2"
-	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/family_1/A_1to1"
+	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/A_1to1"
 	session "github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 )
@@ -152,12 +152,12 @@ func main() {
 	var arr1, arr2 kNucArray
 
 	// Create connections
-	connS := make([]*shm.Listener, 2) // [1: S1-A, 2: S2-A]
+	connS := make([]*shm.ShmListener, 2) // [1: S1-A, 2: S2-A]
 	for i := 0; i < 2; i++ {
 		connS[i], err = shm.Listen(1 + i)
 		defer connS[i].Close()
 	}
-	connB := make([]*shm.Listener, nCPU) // [3: B1-A, 4: B2-A, ...]
+	connB := make([]*shm.ShmListener, nCPU) // [3: B1-A, 4: B2-A, ...]
 	for i := 0; i < nCPU; i++ {
 		connB[i], err = shm.Listen(3 + i)
 		defer connB[i].Close()
@@ -165,7 +165,7 @@ func main() {
 
 	// instantiate protocol
 	prot := Proto.New()
-	mini := prot.New_family_1_A_1to1(nCPU, 1)
+	mini := prot.New_A_1to1(nCPU, 1)
 	for i := range connS {
 		if err := mini.S_1to2_Accept(i+1, connS[i], new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
@@ -221,9 +221,9 @@ func main() {
 func worker(str string) func(*B_1toK.Init) B_1toK.End {
 	return func(s0 *B_1toK.Init) B_1toK.End {
 		matches := make([]string, 1, 1)
-		s1 := s0.A_1to1_Gather_Match(matches)
+		s1 := s0.A_1_Gather_Match(matches)
 		result := []string{fmt.Sprintf("%d %s\n", countOne(str, matches[0]), matches[0])}
-		end := s1.A_1to1_Scatter_Gather(result)
+		end := s1.A_1_Scatter_Gather(result)
 		return *end
 	}
 }
@@ -231,9 +231,9 @@ func worker(str string) func(*B_1toK.Init) B_1toK.End {
 func sorter(i int, str string, arr *kNucArray) func(*S_1to2.Init) S_1to2.End {
 	return func(s0 *S_1to2.Init) S_1to2.End {
 		sorts := make([]int, 1, 1)
-		s1 := s0.A_1to1_Gather_Sort(sorts)
+		s1 := s0.A_1_Gather_Sort(sorts)
 		*arr = sortedArray(count(str, i+1))
-		end := s1.A_1to1_Scatter_Done([]int{i})
+		end := s1.A_1_Scatter_Done([]int{i})
 		return *end
 	}
 }
