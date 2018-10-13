@@ -4,19 +4,19 @@ type <go> "int" from "builtin" as int;
 
 global protocol Proto(role A, role B) {
   choice at A[1] {
-    Times(int) from A[1,1] to B[1,K]; // u x v
-    Done(int)  from B[1,K] to A[1,1];
-    Next(int)  from A[1,1] to B[1,K]; // v x u
-    Done(int)  from B[1,K] to A[1,1];
+    Times(int) from A[1]   to B[1,K]; // u x v
+    Done(int)  from B[1,K] to A[1];
+    Next(int)  from A[1]   to B[1,K]; // v x u
+    Done(int)  from B[1,K] to A[1];
 
-    TimeStr(int) from A[1,1] to B[1,K]; // v x u
-    Done(int)    from B[1,K] to A[1,1];
-    Next(int)    from A[1,1] to B[1,K]; // v x u
-    Done(int)    from B[1,K] to A[1,1];
+    TimeStr(int) from A[1]   to B[1,K]; // v x u
+    Done(int)    from B[1,K] to A[1];
+    Next(int)    from A[1]   to B[1,K]; // v x u
+    Done(int)    from B[1,K] to A[1];
 
     do Proto(A, B);
   } or {
-    End(int) from A[1,1] to B[1,K];
+    Finish(int) from A[1] to B[1,K];
   }
 }
 
