@@ -94,7 +94,6 @@ func initM(M1 *M_1to1.M_1to1, wg *sync.WaitGroup) {
 	}
 	pget.Debugf("M[1]: Ready.\n")
 	M1.Run(M)
-	M1.Close()
 }
 
 func initF1(F *F_1to1and1toK.F_1to1and1toK, shost string, sport int, mln transport2.ScribListener, wg *sync.WaitGroup) {
@@ -108,7 +107,7 @@ func initF1(F *F_1to1and1toK.F_1to1and1toK, shost string, sport int, mln transpo
 	}
 	pget.Debugf("F[1]: Ready.\n")
 	F.Run(F1)
-	F.Close()
+	mln.Close()
 }
 
 func initF2toK(F *F_1toK_not_1to1.F_1toK_not_1to1, Fid int, shost string, sport int, mln transport2.ScribListener, wg *sync.WaitGroup) {
@@ -122,7 +121,7 @@ func initF2toK(F *F_1toK_not_1to1.F_1toK_not_1to1, Fid int, shost string, sport 
 	}
 	pget.Debugf("F[%d]: Ready\n", Fid)
 	F.Run(F2toK(Fid))
-	F.Close()
+	mln.Close()
 }
 
 // connectAB establishes a shared memory connection between AB.
