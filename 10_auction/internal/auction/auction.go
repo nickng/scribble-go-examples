@@ -46,6 +46,7 @@ func Auctioneer(p *Protocol.Protocol, K, self int, cc scributil.ClientConn, host
 		s0 := s.Bidder_1toK_Gather_InitialBid(initBids)
 		scributil.Debugf("[info] Auctioneer: initial bids: %v.\n", initBids)
 		highest, _, _ := topInitialBid(initBids)
+		scributil.Delay(1500)
 		s1 := s0.Bidder_1toK_Scatter_HighestBid(highest)
 		for {
 			bids := make([]message.BidOrSkip, K)
@@ -60,10 +61,12 @@ func Auctioneer(p *Protocol.Protocol, K, self int, cc scributil.ClientConn, host
 			if winner := findWinner(bids); winner == nil { // no winner
 				highest, topbid, topbidder := topBid(bids)
 				scributil.Debugf("[info] Auctioneer: Highest bid %d by Bidder[%d].\n", topbid, topbidder)
+				scributil.Delay(1500)
 				s1 = s2.Bidder_1toK_Scatter_HighestBid(highest)
 			} else {
 				winner := findWinner(bids)
 				scributil.Debugf("[info] Auctioneer: Bidder[%d] wins.\n", winner[0].BidderID)
+				scributil.Delay(1500)
 				sEnd := s2.Bidder_1toK_Scatter_Winner(winner)
 				return *sEnd
 			}
@@ -93,6 +96,8 @@ func Bidder(p *Protocol.Protocol, K, self int, sc scributil.ServerConn, port int
 		maxBid := initBid + 5
 		fmt.Printf("Bidder[%d]: Initial bid %d (max bid %d)\n", self, initBid, maxBid)
 		initBidMsg := []message.Initial{message.Initial{Bid: initBid}}
+
+		scributil.Delay(1500)
 		s0 := s.Auctioneer_1_Scatter_InitialBid(initBidMsg)
 		scributil.Debugf("[info] Bidder[%d]: initial bids: %d.\n", self, initBid)
 		highestBid := make([]message.Highest, 1)
@@ -107,6 +112,7 @@ func Bidder(p *Protocol.Protocol, K, self int, sc scributil.ServerConn, port int
 				bid[0].MakeBid = true
 				fmt.Printf("Bidder[%d]: new bid at %d.\n", self, bid[0].Bid)
 			}
+			scributil.Delay(1500)
 			s2 := s1.Auctioneer_1_Scatter_BidOrSkip(bid)
 			scributil.Debugf("[info] Bidder[%d] sent bid: %v.\n", self, bid)
 			switch s3 := s2.Auctioneer_1_Branch().(type) {

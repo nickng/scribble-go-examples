@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"flag"
 
 	"github.com/nickng/scribble-go-examples/2_many-to-one/ManyToOne/Gather"
 	"github.com/nickng/scribble-go-examples/2_many-to-one/gather"
@@ -9,13 +10,14 @@ import (
 )
 
 func main() {
+	var I int
+	flag.IntVar(&I, "I", 1, "self ID")
+
 	connAB, K := scributil.ParseFlags()
 	protocol := Gather.New()
 
 	wg := new(sync.WaitGroup)
-	wg.Add(K)
-	for i := 1; i <= K; i++ {
-		go gather.A1toK(protocol, K, i, connAB, "localhost", connAB.Port(i), wg)
-	}
+	wg.Add(1)
+	gather.A1toK(protocol, K, I, connAB, "localhost", connAB.Port(I), wg)
 	wg.Wait()
 }

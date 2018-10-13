@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"flag"
 
 	"github.com/nickng/scribble-go-examples/10_auction/Auction/Protocol"
 	"github.com/nickng/scribble-go-examples/10_auction/internal/auction"
@@ -9,13 +10,13 @@ import (
 )
 
 func main() {
+	var I int
+	flag.IntVar(&I, "I", 1, "self ID")
 	connAB, K := scributil.ParseFlags()
 	protocol := Protocol.New()
 
 	wg := new(sync.WaitGroup)
-	wg.Add(K)
-	for k := 1; k <= K; k++ {
-		go auction.Bidder(protocol, K, k, connAB, connAB.Port(k), wg)
-	}
+	wg.Add(1)
+	auction.Bidder(protocol, K, I, connAB, connAB.Port(I), wg)
 	wg.Wait()
 }
