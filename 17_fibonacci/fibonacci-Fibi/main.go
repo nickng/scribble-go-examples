@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	i := flag.Int("self", 3, "Specify fib ID")
+	i := flag.Int("I", 3, "Specify fib ID")
 	conn, K := scributil.ParseFlags()
 	protocol := Fibonacci.New()
 

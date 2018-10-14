@@ -9,7 +9,7 @@ import (
 	"github.com/nickng/scribble-go-examples/scributil"
 )
 
-var buyer = flag.Int("buyer", 1, "Specify Buyer ID (1..K)")
+var buyer = flag.Int("I", 1, "Specify Buyer ID (1..K)")
 
 func main() {
 	conn, K := scributil.ParseFlags()
