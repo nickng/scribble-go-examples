@@ -47,12 +47,13 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto"
+	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/A_1to1"
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/B_1toK"
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/S_1to2"
-	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto/A_1to1"
 	session "github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 )
@@ -166,15 +167,23 @@ func main() {
 	// instantiate protocol
 	prot := Proto.New()
 	mini := prot.New_A_1to1(nCPU, 1)
+	wg := new(sync.WaitGroup)
+	wg.Add(len(connS) + len(connB))
 	for i := range connS {
-		if err := mini.S_1to2_Accept(i+1, connS[i], new(session.PassByPointer)); err != nil {
-			log.Fatal(err)
-		}
+		go func(i int) {
+			if err := mini.S_1to2_Accept(i+1, connS[i], new(session.PassByPointer)); err != nil {
+				log.Fatal(err)
+			}
+			wg.Done()
+		}(i)
 	}
 	for i := range connB {
-		if err := mini.B_1toK_Accept(i+1, connB[i], new(session.PassByPointer)); err != nil {
-			log.Fatal(err)
-		}
+		go func(i int) {
+			if err := mini.B_1toK_Accept(i+1, connB[i], new(session.PassByPointer)); err != nil {
+				log.Fatal(err)
+			}
+			wg.Done()
+		}(i)
 	}
 
 	// main session initiated, main function created
@@ -205,6 +214,7 @@ func main() {
 	for idx := 0; idx < nCPU; idx++ {
 		workers[idx] = workerInitialise(idx)
 	}
+	wg.Wait()
 
 	// run sorters + workers
 	go sorter1()
