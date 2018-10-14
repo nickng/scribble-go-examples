@@ -29,9 +29,9 @@ func initSM(t testing.TB, Count, N int) (roles []rolesScatter, cleanupFn func())
 		// ---- Protocol initialisation END ----
 	}
 	var err error
-	lnN := make([][]*shm.Listener, Count)
+	lnN := make([][]*shm.ShmListener, Count)
 	for c := 0; c < Count; c++ {
-		lnN[c] = make([]*shm.Listener, N)
+		lnN[c] = make([]*shm.ShmListener, N)
 		for n := 0; n < N; n++ {
 			lnN[c][n], err = shm.Listen(c*N + n)
 			if err != nil {
@@ -161,7 +161,7 @@ func scribbleSM(t testing.TB, Count, N int) {
 			for c := 0; c < Count; c++ {
 				// ---- Begin overhead measurement ----
 				roles[c].BN[n].Run(func(s *B_1toN.Init) B_1toN.End {
-					return *(s.A_1to1_Gather_Int(vals))
+					return *(s.A_1_Gather_Int(vals))
 				})
 				// ---- End overhead measurement ----
 			}

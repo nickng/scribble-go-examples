@@ -1,5 +1,3 @@
-//go:generate scribblec-param.sh ../Microbenchmarks.scr -d ../ -param Alltoall github.com/nickng/scribble-go-examples/microbenchmarks/Microbenchmarks -param-api A -param-api B
-
 package main
 
 import (
