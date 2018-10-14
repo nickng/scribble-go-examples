@@ -5,8 +5,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi"
-	"github.com/nickng/scribble-go-examples/11_jacobi/internal/jacobi"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi"
+	"github.com/nickng/scribble-go-examples/18_jacobi/internal/jacobi"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
 

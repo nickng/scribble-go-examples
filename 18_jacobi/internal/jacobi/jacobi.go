@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh ../../Jacobi.scr -d ../../ -param Jacobi github.com/nickng/scribble-go-examples/11_jacobi/Jacobi -param-api W
+//go:generate scribblec-param.sh ../../Jacobi.scr -d ../../ -param Jacobi github.com/nickng/scribble-go-examples/18_jacobi/Jacobi -param-api W
 
 package jacobi
 
@@ -9,12 +9,12 @@ import (
 
 	"github.com/nickng/scribble-go-examples/scributil"
 
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi"
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi/family_1/W_1to1_not_2to2and2toKsub1and3toK"
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi/family_1/W_2to2and2toKsub1_not_1to1and3toK"
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi/family_1/W_2toKsub1and3toK_not_1to1and2to2"
-	"github.com/nickng/scribble-go-examples/11_jacobi/Jacobi/Jacobi/family_1/W_3toK_not_1to1and2to2and2toKsub1"
-	"github.com/nickng/scribble-go-examples/11_jacobi/message"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi/family_1/W_1to1_not_2to2and2toKsub1and3toK"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi/family_1/W_2to2and2toKsub1_not_1to1and3toK"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi/family_1/W_2toKsub1and3toK_not_1to1and2to2"
+	"github.com/nickng/scribble-go-examples/18_jacobi/Jacobi/Jacobi/family_1/W_3toK_not_1to1and2to2and2toKsub1"
+	"github.com/nickng/scribble-go-examples/18_jacobi/message"
 )
 
 func init() {
