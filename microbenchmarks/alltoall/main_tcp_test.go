@@ -28,7 +28,7 @@ func initTCP(t testing.TB, Count, M, N int) (roles []rolesAlltoall, cleanupFn fu
 		roles[c].BN = make([]*B_1toN.B_1toN, N)
 		// ---- Protocol initialisation ----
 		for m := 0; m < M; m++ {
-			roles[c].AM[m] = prot.New_A_1toM(N, M, m+1)
+			roles[c].AM[m] = prot.New_A_1toM(M, N, m+1)
 			roles[c].AM[m].Params["M"] = M
 			roles[c].AM[m].Params["N"] = N
 		}

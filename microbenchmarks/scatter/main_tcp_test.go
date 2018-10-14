@@ -1,5 +1,3 @@
-//go:generate scribblec-param.sh ../Microbenchmarks.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/microbenchmarks/Microbenchmarks -param-api A -param-api B
-
 package main_test
 
 import (
@@ -199,7 +197,7 @@ func scribbleTCP(t testing.TB, Count, N int) {
 			for c := 0; c < Count; c++ {
 				// ---- Begin overhead measurement ----
 				roles[c].BN[n].Run(func(s *B_1toN.Init) B_1toN.End {
-					return *(s.A_1to1_Gather_Int(vals))
+					return *(s.A_1_Gather_Int(vals))
 				})
 				// ---- End overhead measurement ----
 			}
