@@ -45,14 +45,15 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto"
+	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/A_1to1"
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/B_1toK"
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/C_1to1"
-	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/A_1to1"
-	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 	session "github.com/rhu1/scribble-go-runtime/runtime/session2"
+	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 )
 
 var allvariants = []string{
@@ -149,14 +150,22 @@ func main() {
 
 	prot := Proto.New()
 	mini := prot.New_A_1to1(nCPU, 1)
-	for i, conn := range connB {
-		if err := mini.B_1toK_Accept(i+1, conn, new(session.PassByPointer)); err != nil {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(connB) + 1)
+	for i := range connB {
+		go func(i int) {
+			if err := mini.B_1toK_Accept(i+1, connB[i], new(session.PassByPointer)); err != nil {
+				log.Fatal(err)
+			}
+			wg.Done()
+		}(i)
+	}
+	go func() {
+		if err := mini.C_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
-	}
-	if err := mini.C_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
-		log.Fatal(err)
-	}
+		wg.Done()
+	}()
 
 	// main session initiated, main function created
 	mmain := func() {
@@ -190,6 +199,7 @@ func main() {
 	for idx := 0; idx < nCPU; idx++ {
 		bmains[idx] = mkbmain(idx)
 	}
+	wg.Wait()
 
 	// Launch workers. Unlike in the first program, they stop at the first
 	// receive until master distributes tasks.
