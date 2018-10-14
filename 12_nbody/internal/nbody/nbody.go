@@ -8,9 +8,9 @@ import (
 	"sync"
 
 	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody"
-	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_1/W_1to1_not_2to2and2toKsub1and3toKandKtoK"
-	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_1/W_2to2and2toKsub1_not_1to1and3toKandKtoK"
-	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_1/W_3toKandKtoK_not_1to1and2to2and2toKsub1"
+	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_2/W_1to1_not_2to2and2toKsub1and3toKandKtoK"
+	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_2/W_2toKsub1and3toK_not_1to1and2to2andKtoK"
+	"github.com/nickng/scribble-go-examples/12_nbody/NBody/NBody/family_2/W_3toKandKtoK_not_1to1and2to2and2toKsub1"
 	"github.com/nickng/scribble-go-examples/12_nbody/message"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
@@ -26,13 +26,13 @@ func init() {
 // W1 is the main worker W[1] which also decides if the iteration should continue.
 func W1(p *NBody.NBody, K, self int, w2 scributil.ClientConn, w2Host string, w2Port int, wn scributil.ClientConn, wNHost string, wNPort int, wg *sync.WaitGroup) {
 	// W[1]\[2,2..K-1,3..K,K]
-	W1 := p.New_family_1_W_1to1_not_2to2and2toKsub1and3toKandKtoK(K, self)
+	W1 := p.New_family_2_W_1to1_not_2to2and2toKsub1and3toKandKtoK(K, self)
 	particles := loadParticles("particles.txt", self)
 	rcvd := []message.Particles{particles}
 	var velocities message.Vector3 // Stores the velocities
 
 	scributil.Debugf("[connection] W[%d]: dialling to W[%d] at %s:%d.\n", self, self+1, w2Host, w2Port)
-	if err := W1.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Dial(self+1, w2Host, w2Port, w2.Dial, w2.Formatter()); err != nil {
+	if err := W1.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, w2Host, w2Port, w2.Dial, w2.Formatter()); err != nil {
 		log.Fatalf("cannot dial: %v", err)
 	}
 	scributil.Debugf("[connection] W[%d]: dialling to W[%d] at %s:%d.\n", self, K, wNHost, wNPort)
@@ -66,8 +66,8 @@ func W1(p *NBody.NBody, K, self int, w2 scributil.ClientConn, w2Host string, w2P
 
 // Wi is the common middle worker W[i].
 func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, wNext scributil.ClientConn, wNextHost string, wNextPort int, wg *sync.WaitGroup) {
-	// W[2,2..K-1]\[1,3..K,K]
-	Wi := p.New_family_1_W_2to2and2toKsub1_not_1to1and3toKandKtoK(K, self)
+	// W[i]
+	Wi := p.New_family_2_W_2toKsub1and3toK_not_1to1and2to2andKtoK(K, self)
 	particles := loadParticles("particles.txt", self)
 	rcvd := particles
 	var velocities message.Vector3 // Stores the velocities
@@ -82,18 +82,18 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	}
 	defer ln.Close()
 	scributil.Debugf("[connection] W[%d]: listening for W[%d] at :%d.\n", self, self-1, wPrevPort)
-	if err := Wi.W_1to1_not_2to2and2toKsub1and3toKandKtoK_Accept(self-1, ln, wPrev.Formatter()); err != nil {
+	if err := Wi.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, ln, wPrev.Formatter()); err != nil {
 		log.Fatalf("cannot accept: %v", err)
 	}
 	scributil.Debugf("W[%d]: Ready.\n", self)
 
-	Wi.Run(func(s *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Init) W_2to2and2toKsub1_not_1to1and3toKandKtoK.End {
+	Wi.Run(func(s *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Init) W_2toKsub1and3toK_not_1to1and2to2andKtoK.End {
 		for {
-			switch s0 := s.W_1_Branch().(type) {
-			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Particles_W_Init:
+			switch s0 := s.W_selfsub1_Branch().(type) {
+			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Particles_W_Init:
 				var p message.Particles
 				scributil.Delay(1500)
-				s = s0.Recv_Particles(&p).W_3_Scatter_Particles([]message.Particles{rcvd})
+				s = s0.Recv_Particles(&p).W_selfplus1_Scatter_Particles([]message.Particles{rcvd})
 				scributil.Debugf("W[%d]: received %v.\n", self, p)
 				rcvd = p
 				velocities = compute(particles, p, velocities)
@@ -102,10 +102,10 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 					update(particles, velocities)
 					scributil.Debugf("[nbody] W[%d]: update positions.\n", self)
 				}
-			case *W_2to2and2toKsub1_not_1to1and3toKandKtoK.Stop_W_Init:
+			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Stop_W_Init:
 				var stop message.Stop
 				scributil.Delay(1500)
-				sEnd := s0.Recv_Stop(&stop).W_3_Scatter_Stop([]message.Stop{stop})
+				sEnd := s0.Recv_Stop(&stop).W_selfplus1_Scatter_Stop([]message.Stop{stop})
 				//		scributil.Debugf("W[%d]: received %v.\n", self, stop)
 				return *sEnd
 			}
@@ -116,8 +116,8 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 
 // WK is the last worker W[K], which loops back to W[1].
 func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, w1 scributil.ServerConn, w1Port int, wg *sync.WaitGroup) {
-	// W[3..K,K]\[1,2,2..K-1]
-	WK := p.New_family_1_W_3toKandKtoK_not_1to1and2to2and2toKsub1(K, self)
+	// W[K]
+	WK := p.New_family_2_W_3toKandKtoK_not_1to1and2to2and2toKsub1(K, self)
 	particles := loadParticles("particles.txt", self)
 	rcvd := particles
 	var velocities message.Vector3 // Stores the velocities
@@ -128,7 +128,7 @@ func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	}
 	defer lnPrev.Close()
 	scributil.Debugf("[connection] W[%d]: listening for W[%d] at :%d.\n", self, self-1, wPrevPort)
-	if err := WK.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
+	if err := WK.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
 		log.Fatalf("cannot accept: %v", err)
 	}
 	ln, err := w1.Listen(w1Port)
