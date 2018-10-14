@@ -219,7 +219,7 @@ func Wi(p *Jacobi.Jacobi, K, self int, wprev scributil.ServerConn, wprevPort int
 		prevLeft, prevRight = initialBounds(dimen[0])
 		for {
 			switch s1 := s0.W_selfsub1_Branch().(type) {
-			case *W_2toKsub1and3toK_not_1to1and2to2.Bound_W_State2:
+			case *W_2toKsub1and3toK_not_1to1and2to2.Bound_W_State6:
 				left, right = calculate(dimen[0], prevLeft, prevRight)
 				s2 := s1.Recv_Bound(&prevLeft)
 				scributil.Debugf("W[%d]: received %v\n", self, prevLeft)
@@ -234,7 +234,7 @@ func Wi(p *Jacobi.Jacobi, K, self int, wprev scributil.ServerConn, wprevPort int
 				s0 = s4.W_selfplus1_Gather_Bound(b)
 				prevRight = b[0]
 				scributil.Debugf("W[%d]: received %v\n", self, prevRight)
-			case *W_2toKsub1and3toK_not_1to1and2to2.Converged_W_State2:
+			case *W_2toKsub1and3toK_not_1to1and2to2.Converged_W_State6:
 				var conv message.Converged
 
 				scributil.Delay(1500)
