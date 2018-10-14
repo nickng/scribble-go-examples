@@ -128,7 +128,7 @@ func WK(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	}
 	defer lnPrev.Close()
 	scributil.Debugf("[connection] W[%d]: listening for W[%d] at :%d.\n", self, self-1, wPrevPort)
-	if err := WK.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
+	if err := WK.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, lnPrev, wPrev.Formatter()); err != nil {
 		log.Fatalf("cannot accept: %v", err)
 	}
 	ln, err := w1.Listen(w1Port)
