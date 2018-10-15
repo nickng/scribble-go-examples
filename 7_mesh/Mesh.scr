@@ -15,3 +15,21 @@ global protocol Mesh3(role W) {
     Data from W[I1] to W[I2];
   }
 }
+
+global protocol Scatter(role M, role W) {
+  foreach W[I:(1,1),K] {
+    Data from M[(1,1)] to W[I]; // Or M[1], if possible
+  }
+}
+
+global protocol Gather(role M, role W) {
+  foreach W[I:(1,1),K] {
+    Data from W[I] to M[(1,1)]; // Or M[1], if possible
+  }
+}
+
+global protocol Diagonal(role W) {
+  foreach W[I:(1,1),K-(1,1)], W[J:(2,2),K] {
+    Data from W[I] to W[J];
+  }
+}
