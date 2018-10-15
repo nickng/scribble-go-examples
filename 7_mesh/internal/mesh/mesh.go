@@ -52,7 +52,7 @@ func W11(p *Mesh1.Mesh1, N, self session2.Pair, next scributil.ClientConn, nextH
 }
 
 // Wi1 implements W[i][1].
-func Wi1(p *Mesh1.Mesh1, N, self session2.Pair, next scributil.ClientConn, nextHost string, nextPort int, prev scributil.ServerConn, prevPort int, wg *sync.WaitGroup) {
+func Wi1(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevPort int, next scributil.ClientConn, nextHost string, nextPort int, wg *sync.WaitGroup) {
 	W1i := p.New_family_1_W_l1r1plusl1r0toKhwandl1r1toKhwsubl1r0(N, self)
 
 	selfnext := self.Plus(session2.XY(1, 0))
@@ -95,9 +95,9 @@ func Wi1(p *Mesh1.Mesh1, N, self session2.Pair, next scributil.ClientConn, nextH
 	wg.Done()
 }
 
-// W1K implements W[1][K].
-func W1K(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevPort int, wg *sync.WaitGroup) {
-	W1K := p.New_family_1_W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0(N, self)
+// WK1 implements W[K][1].
+func WK1(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevPort int, wg *sync.WaitGroup) {
+	WK1 := p.New_family_1_W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0(N, self)
 
 	ln, err := prev.Listen(prevPort)
 	if err != nil {
@@ -107,17 +107,17 @@ func W1K(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevP
 	selfprev := self.Sub(session2.XY(1, 0))
 	scributil.Debugf("[connection] W[%s]: listening for W[%s] at :%d.\n", self, selfprev, prevPort)
 	if selfprev.Eq(session2.XY(1, 1)) {
-		if err := W1K.W_l1r1toKhwsubl1r0_not_l1r1plusl1r0toKhw_Accept(selfprev, ln, prev.Formatter()); err != nil {
+		if err := WK1.W_l1r1toKhwsubl1r0_not_l1r1plusl1r0toKhw_Accept(selfprev, ln, prev.Formatter()); err != nil {
 			log.Fatalf("cannot accept: %v", err)
 		}
 	} else {
-		if err := W1K.W_l1r1plusl1r0toKhwandl1r1toKhwsubl1r0_Accept(selfprev, ln, prev.Formatter()); err != nil {
+		if err := WK1.W_l1r1plusl1r0toKhwandl1r1toKhwsubl1r0_Accept(selfprev, ln, prev.Formatter()); err != nil {
 			log.Fatalf("cannot accept: %v", err)
 		}
 	}
 	scributil.Debugf("W[%s]: Ready.\n", self)
 
-	W1K.Run(func(s *W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0.Init) W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0.End {
+	WK1.Run(func(s *W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0.Init) W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0.End {
 		d := make([]message.Data, 1)
 		sEnd := s.W_selfpluslneg1r0_Gather_Data(d)
 		scributil.Debugf("W[%s]: received %v.\n", self, d)
@@ -130,7 +130,7 @@ func W1K(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevP
 func W11v(p *Mesh3.Mesh3, N, self session2.Pair, next scributil.ClientConn, nextHost string, nextPort int, wg *sync.WaitGroup) {
 	W11v := p.New_family_1_W_l1r1toK1wsubl0r1_not_l1r2toK1w(N, self)
 
-	selfnext := self.Sub(session2.XY(self.X, self.Y+1))
+	selfnext := self.Plus(session2.XY(0, 1))
 	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
 	if selfnext.Eq(N) {
 		if err := W11v.W_l1r2toK1w_not_l1r1toK1wsubl0r1_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
@@ -153,10 +153,10 @@ func W11v(p *Mesh3.Mesh3, N, self session2.Pair, next scributil.ClientConn, next
 }
 
 // W1iv implements W[1][i] (vertical loop).
-func W1iv(p *Mesh3.Mesh3, N, self session2.Pair, next scributil.ClientConn, nextHost string, nextPort int, prev scributil.ServerConn, prevPort int, wg *sync.WaitGroup) {
+func W1iv(p *Mesh3.Mesh3, N, self session2.Pair, prev scributil.ServerConn, prevPort int, next scributil.ClientConn, nextHost string, nextPort int, wg *sync.WaitGroup) {
 	W1iv := p.New_family_1_W_l1r1toK1wsubl0r1andl1r2toK1w(N, self)
 
-	selfnext := self.Sub(session2.XY(self.X, self.Y+1))
+	selfnext := self.Plus(session2.XY(0, 1))
 	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
 	if selfnext.Eq(N) {
 		if err := W1iv.W_l1r2toK1w_not_l1r1toK1wsubl0r1_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
@@ -172,7 +172,7 @@ func W1iv(p *Mesh3.Mesh3, N, self session2.Pair, next scributil.ClientConn, next
 		log.Fatalf("cannot listen: %v", err)
 	}
 	defer ln.Close()
-	selfprev := self.Sub(session2.XY(self.X, self.Y-1))
+	selfprev := self.Sub(session2.XY(0, 1))
 	scributil.Debugf("[connection] W[%s]: listening for W[%s] at :%d.\n", self, selfprev, prevPort)
 	if selfprev.Eq(session2.XY(1, 1)) {
 		if err := W1iv.W_l1r1toK1wsubl0r1_not_l1r2toK1w_Accept(selfprev, ln, prev.Formatter()); err != nil {
@@ -205,7 +205,7 @@ func W1Kv(p *Mesh3.Mesh3, N, self session2.Pair, prev scributil.ServerConn, prev
 		log.Fatalf("cannot listen: %v", err)
 	}
 	defer ln.Close()
-	selfprev := self.Sub(session2.XY(self.X, self.Y-1))
+	selfprev := self.Sub(session2.XY(0, 1))
 	scributil.Debugf("[connection] W[%s]: listening for W[%s] at :%d.\n", self, selfprev, prevPort)
 	if selfprev.Eq(session2.XY(1, 1)) {
 		if err := W1Kv.W_l1r1toK1wsubl0r1_not_l1r2toK1w_Accept(selfprev, ln, prev.Formatter()); err != nil {
