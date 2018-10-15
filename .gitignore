@@ -19,3 +19,4 @@
 8_fork-join/forkjoin-local/forkjoin-local
 9_pget/PGet/
 9_pget/basic/basic
+*.smt2.tmp
