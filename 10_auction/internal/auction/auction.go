@@ -51,7 +51,7 @@ func Auctioneer(p *Protocol.Protocol, K, self int, cc scributil.ClientConn, host
 		for {
 			bids := make([]message.BidOrSkip, K)
 			k := 0
-			s2 := s1.Foreach(func(s *Auctioneer_1to1.Init_19) Auctioneer_1to1.End {
+			s2 := s1.Foreach(func(s *Auctioneer_1to1.Init_8) Auctioneer_1to1.End {
 				sEnd := s.Bidder_I_Gather_BidOrSkip(bids[k:])
 				k++
 				return *sEnd
