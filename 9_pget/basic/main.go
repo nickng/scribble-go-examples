@@ -59,7 +59,7 @@ func main() {
 	F1 := p.New_family_1_F_1to1and1toK(K, 1)               // Fetcher F[1]
 	F2toK := make([]*F_1toK_not_1to1.F_1toK_not_1to1, K-1) // Fetcher F[2,K]
 	for i := 2; i <= K; i++ {
-		F2toK[i-2] = p.New_family_1_F_1toK_not_1to1(K, 1)
+		F2toK[i-2] = p.New_family_1_F_1toK_not_1to1(K, i)
 	}
 	FListeners := make([]transport2.ScribListener, K)
 	var err error
