@@ -56,7 +56,7 @@ func Server_tail(wg *sync.WaitGroup, K int, self int) *Tail.End {
 	}
 	defer ss.Close()
 	if err = R.
-			W_1toKsub1_not_2toK_Accept(self-1, ss, FORMATTER());
+			W_1toKsub1and2toK_Accept(self-1, ss, FORMATTER());
 			//W_1toKsub1_not_2toK_Accept(self-1, ss, FORMATTER());  // Target variant (L/M) not constrained, but safe to use either
 			err != nil {
 		panic(err)

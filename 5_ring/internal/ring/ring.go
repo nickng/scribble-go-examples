@@ -114,29 +114,28 @@ func Ring_mid(wg *sync.WaitGroup, K int, self int) *M.End {
 	}
 	defer ss.Close()
 
-	/*if self == 3 {
-		if err = M.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, ss, FORMATTER()); err != nil {  // FIXME: shouldn't have
-			panic(err)
-		}
-	} else {*/
-	if err = M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, ss, FORMATTER()); err != nil {
-		panic(err)
-	}
-	//}
-	fmt.Println("M ("+strconv.Itoa(M.Self)+") accepted", self-1, "on", PORT+self)
+if self > 2 {
+if err = M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, ss, FORMATTER()); err != nil { // FIXME: shouldn't have
+panic(err)
+}
+} else {
+if err = M.W_1to1_not_2to2and2toKsub1and3toKandKtoK_Accept(self-1, ss, FORMATTER()); err != nil {
+panic(err)
+}
+}
+fmt.Println("M (" + strconv.Itoa(M.Self) + ") accepted", self-1, "on", PORT+self)
 
-	if self == K-1 {
-		if err := M.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
-			panic(err)
-		}
-	} else {
-		if err := M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
-			panic(err)
-		}
-	}
-	fmt.Println("M ("+strconv.Itoa(M.Self)+") connected to", self+1, "on", PORT+self+1)
-
-	end := M.Run(runM)
+if self == K-1 {
+if err := M.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
+panic(err)
+}
+} else {
+if err := M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
+panic(err)
+}
+}
+	
+end := M.Run(runM)
 	wg.Done()
 	return &end
 }

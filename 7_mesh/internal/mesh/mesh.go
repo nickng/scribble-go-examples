@@ -92,7 +92,7 @@ func Wi1(p *Mesh1.Mesh1, N, self session2.Pair, prev scributil.ServerConn, prevP
 	selfprev := self.Sub(session2.XY(1, 0))
 	scributil.Debugf("[connection] W[%s]: listening for W[%s] at :%d.\n", self, selfprev, prevPort)
 	if selfprev.Eq(session2.XY(1, 1)) {
-		if err := W1i.W_l1r1plusl1r0toKhw_not_l1r1toKhwsubl1r0_Accept(selfprev, ln, prev.Formatter()); err != nil {
+		if err := W1i.W_l1r1toKhwsubl1r0_not_l1r1plusl1r0toKhw_Accept(selfprev, ln, prev.Formatter()); err != nil {
 			log.Fatalf("cannot accept: %v", err)
 		}
 	} else {

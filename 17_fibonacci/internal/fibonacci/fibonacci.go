@@ -41,12 +41,18 @@ func F2(p *Fibonacci.Fibonacci, K, self int, kplus1 scributil.ClientConn, kplus1
 
 	scributil.Debugf("[connection] Fib[%d]: dialling to Fib[%d] at %s:%d.\n", self, self+2, kplus2Host, kplus2Port)
 	// F[3..K-1]
-	if err := F2.Fib_2toKsub1and3toK_not_1toKsub2_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
-		log.Fatalf("cannot dial: %v", err)
+	if K == 5 {
+		if err := F2.Fib_2toKsub1and3toK_not_1toKsub2_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := F2.Fib_1toKsub2and2toKsub1and3toK_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
 	}
 	scributil.Debugf("[connection] Fib[%d]: dialling to Fib[%d] at %s:%d.\n", self, self+1, kplus1Host, kplus1Port)
 	// F[3..K-1]
-	if err := F2.Fib_2toKsub1and3toK_not_1toKsub2_Dial(self+1, kplus1Host, kplus1Port, kplus1.Dial, kplus1.Formatter()); err != nil {
+	if err := F2.Fib_1toKsub2and2toKsub1and3toK_Dial(self+1, kplus1Host, kplus1Port, kplus1.Dial, kplus1.Formatter()); err != nil {
 		log.Fatalf("cannot dial: %v", err)
 	}
 	scributil.Debugf("Fib[%d]: Ready.\n", self)
@@ -65,13 +71,32 @@ func Fi(p *Fibonacci.Fibonacci, K, self int, ksub2 scributil.ServerConn, ksub2Po
 
 	scributil.Debugf("[connection] Fib[%d]: dialling to Fib[%d] at %s:%d.\n", self, self+2, kplus2Host, kplus2Port)
 	// F[3..K-2]
-	if err := Fi.Fib_1toKsub2and2toKsub1and3toK_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
-		log.Fatalf("cannot dial: %v", err)
+	// if err := Fi.Fib_3toK_not_1toKsub2and2toKsub1_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+	// 	log.Fatalf("cannot dial: %v", err)
+	// }
+	if self + 2 == K {
+		if err := Fi.Fib_3toK_not_1toKsub2and2toKsub1_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else if self + 2 == K - 1 {
+		if err := Fi.Fib_2toKsub1and3toK_not_1toKsub2_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := Fi.Fib_1toKsub2and2toKsub1and3toK_Dial(self+2, kplus2Host, kplus2Port, kplus2.Dial, kplus2.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
 	}
 	scributil.Debugf("[connection] Fib[%d]: dialling to Fib[%d] at %s:%d.\n", self, self+1, kplus1Host, kplus1Port)
 	// F[3..K-2]
-	if err := Fi.Fib_1toKsub2and2toKsub1and3toK_Dial(self+1, kplus1Host, kplus1Port, kplus1.Dial, kplus1.Formatter()); err != nil {
-		log.Fatalf("cannot dial: %v", err)
+	if self+1 == K - 1 {
+		if err := Fi.Fib_2toKsub1and3toK_not_1toKsub2_Dial(self+1, kplus1Host, kplus1Port, kplus1.Dial, kplus1.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := Fi.Fib_1toKsub2and2toKsub1and3toK_Dial(self+1, kplus1Host, kplus1Port, kplus1.Dial, kplus1.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
 	}
 	ln1, err := ksub1.Listen(ksub1Port)
 	if err != nil {
@@ -101,6 +126,11 @@ func Fi(p *Fibonacci.Fibonacci, K, self int, ksub2 scributil.ServerConn, ksub2Po
 		if err := Fi.Fib_1toKsub2_not_2toKsub1and3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
 			log.Fatalf("cannot accept: %v", err)
 		}
+	} else if self == 4 {
+		if err := Fi.Fib_1toKsub2and2toKsub1_not_3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
+
 	} else {
 		// Fib[3..K-1]
 		if err := Fi.Fib_1toKsub2and2toKsub1and3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
@@ -146,9 +176,16 @@ func Fksub1(p *Fibonacci.Fibonacci, K, self int, ksub2 scributil.ServerConn, ksu
 	defer ln2.Close()
 	scributil.Debugf("[connection] Fib[%d]: listening for Fib[%d] at :%d.\n", self, self-2, ksub2Port)
 	// Fib[3..K-2]
-	if err := Fksub1.Fib_1toKsub2and2toKsub1and3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
-		log.Fatalf("cannot accept: %v", err)
+	if K == 5 {
+		if err := Fksub1.Fib_1toKsub2and2toKsub1_not_3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
+	} else {
+		if err := Fksub1.Fib_1toKsub2and2toKsub1and3toK_Accept(self-2, ln2, ksub2.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
 	}
+
 	scributil.Debugf("Fib[%d]: Ready.\n", self)
 
 	Fksub1.Run(func(s *Fib_2toKsub1and3toK_not_1toKsub2.Init) Fib_2toKsub1and3toK_not_1toKsub2.End {
