@@ -46,7 +46,7 @@ func implW1i(p *Solver.Solver, N, self session2.Pair, next scributil.ClientConn,
 
 	selfnext := self.Plus(session2.XY(1, 0))
 	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
-	if err := W1i.W_l1r1plusl1r0toK_not_l1r1toKsubl1r0_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
+	if err := W1i.W_l1r1plusl1r0toKandl1r1toKsubl1r0_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
 		log.Fatalf("cannot dial: %v", err)
 	}
 	scributil.Debugf("W[%s]: Ready.\n", self)
@@ -104,8 +104,14 @@ func implW1Sync(p2 *Sync.Sync, N, self session2.Pair, syncConn scributil.ConnPar
 		selfnext := self.Plus(session2.XY(0, 1))
 		time.Sleep(time.Duration((N.Y-self.Y)*100) * time.Millisecond)
 		scributil.Debugf("W[%s]: dialling to W[%s] at %s:%d\n", self, selfnext, syncHost, syncBasePort+self.Y+1)
-		if err := W1isync.W_l1r1toKsubl0r1andl1r2toK_Dial(selfnext, syncHost, syncBasePort+self.Y+1, syncConn.Dial, syncConn.Formatter()); err != nil {
-			log.Fatalf("cannot dial: %v", err)
+		if selfnext.Y == N.Y {
+			if err := W1isync.W_l1r2toK_not_l1r1toKsubl0r1_Dial(selfnext, syncHost, syncBasePort+self.Y+1, syncConn.Dial, syncConn.Formatter()); err != nil {
+				log.Fatalf("cannot dial: %v", err)
+			}
+		} else {
+			if err := W1isync.W_l1r1toKsubl0r1andl1r2toK_Dial(selfnext, syncHost, syncBasePort+self.Y+1, syncConn.Dial, syncConn.Formatter()); err != nil {
+				log.Fatalf("cannot dial: %v", err)
+			}
 		}
 		lnSync, err := syncConn.Listen(syncBasePort + self.Y)
 		if err != nil {
@@ -114,8 +120,14 @@ func implW1Sync(p2 *Sync.Sync, N, self session2.Pair, syncConn scributil.ConnPar
 		defer lnSync.Close()
 		selfprev := self.Sub(session2.XY(0, 1))
 		scributil.Debugf("W[%s]: listening for W[%s] at :%d\n", self, selfprev, syncBasePort+self.Y)
-		if err := W1isync.W_l1r1toKsubl0r1andl1r2toK_Accept(selfprev, lnSync, syncConn.Formatter()); err != nil {
-			log.Fatalf("cannot accept: %v", err)
+		if selfprev.Y == 1 {
+			if err := W1isync.W_l1r1toKsubl0r1_not_l1r2toK_Accept(selfprev, lnSync, syncConn.Formatter()); err != nil {
+				log.Fatalf("cannot accept: %v", err)
+			}
+		} else {
+			if err := W1isync.W_l1r1toKsubl0r1andl1r2toK_Accept(selfprev, lnSync, syncConn.Formatter()); err != nil {
+				log.Fatalf("cannot accept: %v", err)
+			}
 		}
 		scributil.Debugf("W[%s]: Ready (sync).\n", self)
 		W1isync.Run(func(s *W_l1r1toKsubl0r1andl1r2toK.Init) W_l1r1toKsubl0r1andl1r2toK.End {
@@ -135,9 +147,14 @@ func Wii(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, pre
 
 	selfnext := self.Plus(session2.XY(1, 0))
 	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
-	// Note: note distinguishing between different rows.
-	if err := Wii.W_l1r1plusl1r0toKandl1r1toKsubl1r0_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
-		log.Fatalf("cannot dial: %v", err)
+	if selfnext.X == N.X {
+		if err := Wii.W_l1r1plusl1r0toK_not_l1r1toKsubl1r0_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := Wii.W_l1r1plusl1r0toKandl1r1toKsubl1r0_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
 	}
 	ln, err := prev.Listen(prevPort)
 	if err != nil {
@@ -146,8 +163,14 @@ func Wii(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, pre
 	defer ln.Close()
 	selfprev := self.Sub(session2.XY(1, 0))
 	scributil.Debugf("[connection] W[%s]: listening for W[%s] at :%d.\n", self, selfprev, prevPort)
-	if err := Wii.W_l1r1plusl1r0toKandl1r1toKsubl1r0_Accept(selfprev, ln, prev.Formatter()); err != nil {
-		log.Fatalf("cannot listen: %v", err)
+	if selfprev.X == 1 {
+		if err := Wii.W_l1r1toKsubl1r0_not_l1r1plusl1r0toK_Accept(selfprev, ln, prev.Formatter()); err != nil {
+			log.Fatalf("cannot listen: %v", err)
+		}
+	} else {
+		if err := Wii.W_l1r1plusl1r0toKandl1r1toKsubl1r0_Accept(selfprev, ln, prev.Formatter()); err != nil {
+			log.Fatalf("cannot listen: %v", err)
+		}
 	}
 	scributil.Debugf("W[%s]: Ready.\n", self)
 
