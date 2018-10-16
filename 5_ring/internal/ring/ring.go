@@ -144,7 +144,7 @@ func Ring_mid(wg *sync.WaitGroup, K int, self int) *M.End {
 func runM(s *M.Init) M.End {
 	var end *M.End
 	switch c := s.W_selfsub1_Branch().(type) {
-	case *M.Foo: // CHECKME: case type name vs. serverWK
+	case *M.Foo_W_Init: // CHECKME: case type name vs. serverWK
 		var x messages.Foo
 		s2 := c.Recv_Foo(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Foo:", x)
@@ -153,7 +153,7 @@ func runM(s *M.Init) M.End {
 		s = s2.W_selfplus1_Scatter_Foo(pay)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
 		return runM(s)
-	case *M.Bar:
+	case *M.Bar_W_Init:
 		var x messages.Bar
 		s3 := c.Recv_Bar(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Bar:", x)

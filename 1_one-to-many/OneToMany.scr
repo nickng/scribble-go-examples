@@ -1,4 +1,3 @@
-//Raymond@HZHL3 ~/code/go/src/github.com/nickng/scribble-go-examples
 //$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 1_one-to-many/OneToMany.scr -d 1_one-to-many -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 //$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 1_one-to-many/OneToMany.scr -d 1_one-to-many -param Foreach github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
 

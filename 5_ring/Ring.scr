@@ -1,3 +1,5 @@
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 5_ring/Ring.scr -d 5_ring -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
+
 module Ring;
 
 sig <go> "messages.Foo" from "github.com/nickng/scribble-go-examples/5_ring/messages" as Foo;

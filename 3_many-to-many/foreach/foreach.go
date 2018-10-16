@@ -82,7 +82,7 @@ func B(p *Foreach.Foreach, M, N, selfN int, sc scributil.ServerConn, port int, w
 	B.Run(func(s *B_1toN.Init) B_1toN.End {
 		d := make([]message.Data, M)
 		i := 0
-		sEnd := s.Foreach(func(s *B_1toN.Init_15) B_1toN.End {
+		sEnd := s.Foreach(func(s *B_1toN.Init_14) B_1toN.End {
 			sEnd := s.A_I_Gather_Data(d[i:])
 			i++
 			return *sEnd

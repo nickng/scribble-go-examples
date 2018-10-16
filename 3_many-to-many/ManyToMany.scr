@@ -1,3 +1,6 @@
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 3_many-to-many/ManyToMany.scr -d 3_many-to-many -param Alltoall github.com/nickng/scribble-go-examples/3_many-to-many/ManyToMany -param-api A -param-api B
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 3_many-to-many/ManyToMany.scr -d 3_many-to-many -param Foreach github.com/nickng/scribble-go-examples/3_many-to-many/ManyToMany -param-api A -param-api B
+
 // ManyToMany - the "all to all" pattern
 
 module ManyToMany;

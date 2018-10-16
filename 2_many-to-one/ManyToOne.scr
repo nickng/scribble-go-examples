@@ -1,3 +1,7 @@
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 2_many-to-one/ManyToOne.scr -d 2_many-to-one -param Gather github.com/nickng/scribble-go-examples/2_many-to-one/ManyToOne -param-api A -param-api B
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 2_many-to-one/ManyToOne.scr -d 2_many-to-one -param Foreach github.com/nickng/scribble-go-examples/2_many-to-one/ManyToOne -param-api A -param-api B
+
+
 // ManyToOne - the "gather" pattern
 
 module ManyToOne;

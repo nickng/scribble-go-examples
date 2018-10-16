@@ -49,7 +49,7 @@ func Client_scatter(p *Foreach.Foreach, K int, self int, cc scributil.ClientConn
 	}
 	A.Run(func(s *A_1to1.Init) A_1to1.End {
 		scributil.Debugf("A: sent %v.\n", d)
-		end := s.Foreach(func(s *A_1to1.Init_7) A_1to1.End {
+		end := s.Foreach(func(s *A_1to1.Init_6) A_1to1.End {
 			end := s.B_I_Scatter_Data(d)
 			d = d[1:]
 			return *end
