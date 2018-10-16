@@ -28,6 +28,22 @@ func init() {
 
 var p2s = new(pipetosync)
 
+func W1iWKi(p *Solver.Solver, p2 *Sync.Sync, N, selfColN session2.Pair, prev scributil.ServerConn, prevPort int, next scributil.ClientConn, nextHost string, nextPort int, syncConn scributil.ConnParam, syncBasePort int, waitlast chan struct{}, wg *sync.WaitGroup) {
+	p2s.init(N.Y)
+
+	selfCol1 := session2.XY(1, selfColN.Y)
+	go func() {
+		if waitlast != nil {
+			<-waitlast
+		}
+		implW1i(p, N, selfCol1, next, nextHost, nextPort)
+	}()
+	implWKi(p, N, selfColN, prev, prevPort, p2s.get(selfColN.Y), waitlast)
+	implW1Sync(p2, N, selfCol1, syncConn, nextHost, syncBasePort)
+	wg.Done()
+	wg.Done()
+}
+
 // W1i implements W[1][i] (leftmost column).
 // It also implements the sync protocol (as the lead columne).
 func W1i(p *Solver.Solver, p2 *Sync.Sync, N, self session2.Pair, next scributil.ClientConn, nextHost string, nextPort int, syncConn scributil.ConnParam, syncBasePort int, wg *sync.WaitGroup) {
@@ -188,11 +204,11 @@ func Wii(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, pre
 
 // WKi implements W[K][i] (rightmost column).
 func WKi(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, prevPort int, wg *sync.WaitGroup) {
-	implWKi(p, N, self, prev, prevPort, nil)
+	implWKi(p, N, self, prev, prevPort, nil, nil)
 	wg.Done()
 }
 
-func implWKi(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, prevPort int, data chan<- []message.Data) {
+func implWKi(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn, prevPort int, data chan<- []message.Data, waitlast chan struct{}) {
 	WKK := p.New_family_1_W_l1r1plusl1r0toK_not_l1r1toKsubl1r0(N, self)
 
 	ln, err := prev.Listen(prevPort)
@@ -206,6 +222,9 @@ func implWKi(p *Solver.Solver, N, self session2.Pair, prev scributil.ServerConn,
 		log.Fatalf("cannot accept: %v", err)
 	}
 	scributil.Debugf("W[%s]: Ready.\n", self)
+	if waitlast != nil {
+		waitlast <- struct{}{}
+	}
 
 	WKK.Run(func(s *W_l1r1plusl1r0toK_not_l1r1toKsubl1r0.Init) W_l1r1plusl1r0toK_not_l1r1toKsubl1r0.End {
 		d := make([]message.Data, 1)
