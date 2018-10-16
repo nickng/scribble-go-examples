@@ -73,8 +73,14 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	var velocities message.Vector3 // Stores the velocities
 
 	scributil.Debugf("[connection] W[%d]: dialling to W[%d] at %s:%d.\n", self, self+1, wNextHost, wNextPort)
-	if err := Wi.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, wNextHost, wNextPort, wNext.Dial, wNext.Formatter()); err != nil {
-		log.Fatalf("cannot dial: %v", err)
+	if self == K-1 {
+		if err := Wi.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, wNextHost, wNextPort, wNext.Dial, wNext.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := Wi.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, wNextHost, wNextPort, wNext.Dial, wNext.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
 	}
 	ln, err := wPrev.Listen(wPrevPort)
 	if err != nil {
@@ -82,15 +88,21 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 	}
 	defer ln.Close()
 	scributil.Debugf("[connection] W[%d]: listening for W[%d] at :%d.\n", self, self-1, wPrevPort)
-	if err := Wi.W_2to2and2toKsub1_not_1to1and3toKandKtoK_Accept(self-1, ln, wPrev.Formatter()); err != nil {
-		log.Fatalf("cannot accept: %v", err)
+	if self == 2 {
+		if err := Wi.W_1to1_not_2to2and2toKsub1and3toKandKtoK_Accept(self-1, ln, wPrev.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
+	} else {
+		if err := Wi.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, ln, wPrev.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
 	}
 	scributil.Debugf("W[%d]: Ready.\n", self)
 
 	Wi.Run(func(s *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Init) W_2toKsub1and3toK_not_1to1and2to2andKtoK.End {
 		for {
 			switch s0 := s.W_selfsub1_Branch().(type) {
-			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Particles:
+			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Particles_W_Init:
 				var p message.Particles
 				scributil.Delay(1500)
 				s = s0.Recv_Particles(&p).W_selfplus1_Scatter_Particles([]message.Particles{rcvd})
@@ -102,7 +114,7 @@ func Wi(p *NBody.NBody, K, self int, wPrev scributil.ServerConn, wPrevPort int, 
 					update(particles, velocities)
 					scributil.Debugf("[nbody] W[%d]: update positions.\n", self)
 				}
-			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Stop:
+			case *W_2toKsub1and3toK_not_1to1and2to2andKtoK.Stop_W_Init:
 				var stop message.Stop
 				scributil.Delay(1500)
 				sEnd := s0.Recv_Stop(&stop).W_selfplus1_Scatter_Stop([]message.Stop{stop})
