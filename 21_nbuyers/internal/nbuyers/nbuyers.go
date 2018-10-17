@@ -139,9 +139,15 @@ func Buyer(p *NBuyers.NBuyers, K, self int, seller scributil.ClientConn, host st
 	}
 	defer ln.Close()
 	scributil.Debugf("[connection] Buyer[%d]: listening for Buyer[%d] at :%d.\n", self, self-1, buyer1Port)
-	if err := Buyer.Buyer_1to1and1toKand1toKsub1_not_2toKandKtoK_Accept(self-1, ln, buyer1.Formatter()); err != nil {
-		log.Fatalf("cannot accept: %v", err)
-	}
+        if self == 2 {
+		if err := Buyer.Buyer_1to1and1toKand1toKsub1_not_2toKandKtoK_Accept(self-1, ln, buyer1.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
+	} else {
+		if err := Buyer.Buyer_1toKand1toKsub1and2toK_not_1to1andKtoK_Accept(self-1, ln, buyer1.Formatter()); err != nil {
+			log.Fatalf("cannot accept: %v", err)
+		}
+        }
 	scributil.Debugf("[connection] Buyer[%d]: dialling to Buyer[%d] at %s:%d.\n", self, self+1, buyerNHost, buyerNPort)
 	if self+1 == K {
 		if err := Buyer.Buyer_1toKand2toKandKtoK_not_1to1and1toKsub1_Dial(self+1, buyerNHost, buyerNPort, buyerN.Dial, buyerN.Formatter()); err != nil {
