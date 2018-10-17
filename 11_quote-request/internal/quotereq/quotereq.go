@@ -47,26 +47,34 @@ func Buyer(p *WebService.WebService, S, self int, supp scributil.ClientConn, hos
 			qr = append(qr, message.QuoteReq{ItemID: 10})
 		}
 		s0 := s.Supplier_1toS_Scatter_QuoteReq(qr)
+		scributil.Debugf("Buyer[%d]: sent %s\n", self, qr)
 		for {
 			quote := make([]message.Quote, S)
 			s1 := s0.Supplier_1toS_Gather_Reply(quote)
+			scributil.Debugf("Buyer[%d]: received %s\n", self, quote)
 			if accept(quote) {
 				sEnd := s1.Supplier_1toS_Scatter_Order(quote)
+				scributil.Debugf("Buyer[%d]: sent order %s\n", self, quote)
 				return *sEnd
 			}
 			s2 := s1.Supplier_1toS_Scatter_Modify(quote)
+			scributil.Debugf("Buyer[%d]: sent modify %s\n", self, quote)
 			switch s3 := s2.Supplier_1_Branch().(type) {
 			case *Buyer_1to1.Confirm:
+				scributil.Debugf("Buyer[%d]: received confifm", self)
 				sEnd := s3.Recv_Confirm()
 				return *sEnd
 			case *Buyer_1to1.Modify:
 				var q message.Quote
 				s1 = s3.Recv_Modify(&q)
+				scributil.Debugf("Buyer[%d]: received modify", self, q)
 			case *Buyer_1to1.Reject:
 				sEnd := s3.Recv_Reject()
+				scributil.Debugf("Buyer[%d]: received reject\n", self)
 				return *sEnd
 			case *Buyer_1to1.Renegotiate:
 				s0 = s3.Recv_Renegotiate()
+				scributil.Debugf("Buyer[%d]: received renegotiate\n", self)
 			}
 		}
 	})
@@ -107,49 +115,68 @@ func Supplier1(p *WebService.WebService, M, S, self int, buy scributil.ServerCon
 	Supplier1.Run(func(s *Supplier_1to1and1toS_not_2toS.Init) Supplier_1to1and1toS_not_2toS.End {
 		qr := make([]message.QuoteReq, 1)
 		s0 := s.Buyer_1_Gather_QuoteReq(qr)
+		scributil.Debugf("Supplier[%d]: received %s\n", self, qr)
 		var qrs []message.QuoteReq
 		for {
 			for i := 1; i <= M; i++ {
 				qrs = append(qrs, message.QuoteReq{ItemID: qr[0].ItemID})
 			}
 			s1 := s0.Manufacturer_1toM_Scatter_QuoteReq(qrs)
+			scributil.Debugf("Supplier[%d]: sent %s\n", self, qrs)
 			quote := make([]message.Quote, M)
 			s2 := s1.Manufacturer_1toM_Gather_Reply(quote)
+			scributil.Debugf("Supplier[%d]: received %s\n", self, quote)
 			s3 := s2.Buyer_1_Scatter_Reply(quote)
+			scributil.Debugf("Supplier[%d]: sent %s\n", self, quote)
 			switch s4 := s3.Buyer_1_Branch().(type) {
 			case *Supplier_1to1and1toS_not_2toS.Modify_Supplier_State7:
 				var q message.Quote
 				s5 := s4.Recv_Modify(&q)
+				scributil.Debugf("Supplier[%d]: received modify %s\n", self, q)
 				if accept([]message.Quote{q}) {
 					s6 := s5.Buyer_1_Scatter_Confirm()
+					scributil.Debugf("Supplier[%d]: sent confirm\n", self)
 					s7 := s6.Manufacturer_1toM_Scatter_Finish()
+					scributil.Debugf("Supplier[%d]: sent finish\n", self)
 					sEnd := s7.Supplier_2toS_Scatter_Finish()
+					scributil.Debugf("Supplier[%d]: sent finish\n", self)
 					return *sEnd
 				}
 				if withinRange() {
 					s6 := s5.Buyer_1_Scatter_Modify([]message.Quote{message.Quote{ItemID: q.ItemID, Quote: q.Quote}})
+					scributil.Debugf("Supplier[%d]: sent modify", self)
 					s7 := s6.Manufacturer_1toM_Scatter_Finish()
+					scributil.Debugf("Supplier[%d]: sent finish\n", self)
 					var quotes []message.Quote
 					for i := 2; i <= S; i++ {
 						quotes = append(quotes, q)
 					}
 					s3 = s7.Supplier_2toS_Scatter_Modify(quotes)
+					scributil.Debugf("Supplier[%d]: sent modify %s\n", self, quotes)
 				} else {
 					if negotiatePossible() {
 						s6 := s5.Buyer_1_Scatter_Renegotiate()
+						scributil.Debugf("Supplier[%d]: sent renegotiate\n", self)
 						s7 := s6.Manufacturer_1toM_Scatter_Renegotiate()
+						scributil.Debugf("Supplier[%d]: sent renegotiate\n", self)
 						s0 = s7.Supplier_2toS_Scatter_Renegotiate()
+						scributil.Debugf("Supplier[%d]: sent renegotiate\n", self)
 					} else {
 						s6 := s5.Buyer_1_Scatter_Reject()
+						scributil.Debugf("Supplier[%d]: sent reject\n", self)
 						s7 := s6.Manufacturer_1toM_Scatter_Finish()
+						scributil.Debugf("Supplier[%d]: sent finish\n", self)
 						sEnd := s7.Supplier_2toS_Scatter_Finish()
+						scributil.Debugf("Supplier[%d]: sent finish\n", self)
 						return *sEnd
 					}
 				}
 			case *Supplier_1to1and1toS_not_2toS.Order:
 				var o message.Quote
 				s5 := s4.Recv_Order(&o)
+				scributil.Debugf("Supplier[%d]: received order %s\n", self, o)
 				sEnd := s5.Manufacturer_1toM_Scatter_Finish()
+				scributil.Debugf("Supplier[%d]: sent finish\n", self)
 				return *sEnd
 			}
 		}
@@ -194,32 +221,40 @@ func Supplier2toS(p *WebService.WebService, M, S, self int, buy scributil.Server
 	Supplier2toS.Run(func(s *Supplier_1toSand2toS_not_1to1.Init) Supplier_1toSand2toS_not_1to1.End {
 		qr := make([]message.QuoteReq, 1)
 		s0 := s.Buyer_1_Gather_QuoteReq(qr)
+		scributil.Debugf("Supplier[%d]: received %s\n", self, qr)
 		var qrs []message.QuoteReq
 		for {
 			for i := 1; i <= M; i++ {
 				qrs = append(qrs, message.QuoteReq{ItemID: qr[0].ItemID})
 			}
 			s1 := s0.Manufacturer_1toM_Scatter_QuoteReq(qrs)
+			scributil.Debugf("Supplier[%d]: sent %s\n", self, qrs)
 			quote := make([]message.Quote, M)
 			s2 := s1.Manufacturer_1toM_Gather_Reply(quote)
 			s3 := s2.Buyer_1_Scatter_Reply(quote)
+			scributil.Debugf("Supplier[%d]: sent %s\n", self, quote)
 			switch s4 := s3.Buyer_1_Branch().(type) {
 			case *Supplier_1toSand2toS_not_1to1.Order_Supplier_State5:
 				var o message.Quote
 				sEnd := s4.Recv_Order(&o)
+				scributil.Debugf("Supplier[%d]: received order %s\n", self, o)
 				return *sEnd
 			case *Supplier_1toSand2toS_not_1to1.Modify_Supplier_State5:
 				var q message.Quote
 				s5 := s4.Recv_Modify(&q)
+				scributil.Debugf("Supplier[%d]: received modify %s\n", self, q)
 				switch s6 := s5.Supplier_1_Branch().(type) {
 				case *Supplier_1toSand2toS_not_1to1.Modify_Supplier_State6:
 					var q message.Quote
 					s3 = s6.Recv_Modify(&q)
+					scributil.Debugf("Supplier[%d]: received modify %s\n", self, q)
 				case *Supplier_1toSand2toS_not_1to1.Finish_Supplier_State6:
 					sEnd := s6.Recv_Finish()
+					scributil.Debugf("Supplier[%d]: received finish\n", self)
 					return *sEnd
 				case *Supplier_1toSand2toS_not_1to1.Renegotiate_Supplier_State6:
 					s0 = s6.Recv_Renegotiate()
+					scributil.Debugf("Supplier[%d]: received renegotiate\n", self)
 				}
 			}
 		}
@@ -262,17 +297,21 @@ func Manufacturer(p *WebService.WebService, M, S, self int, supp scributil.Serve
 		for {
 			qr := make([]message.QuoteReq, S)
 			s0 := s.Supplier_1toS_Gather_QuoteReq(qr)
+			scributil.Debugf("Manufacturer[%d]: received %s\n", self, qr)
 			var quote []message.Quote
 			for i := 1; i <= S; i++ {
 				quote = append(quote, message.Quote{ItemID: qr[i-1].ItemID, Quote: self})
 			}
 			s1 := s0.Supplier_1toS_Scatter_Reply(quote)
+			scributil.Debugf("Manufacturer[%d]: sent %s\n", self, quote)
 			switch s2 := s1.Supplier_1_Branch().(type) {
 			case *Manufacturer_1toM.Finish:
 				sEnd := s2.Recv_Finish()
+				scributil.Debugf("Manufacturer[%d]: received finish\n", self)
 				return *sEnd
 			case *Manufacturer_1toM.Renegotiate_Manufacturer_State3:
 				s = s2.Recv_Renegotiate()
+				scributil.Debugf("Manufacturer[%d]: received renegotiate\n", self)
 			}
 		}
 	})
