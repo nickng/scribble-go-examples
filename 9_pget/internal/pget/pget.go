@@ -58,6 +58,7 @@ func MakeHeadReq(url string) []http.HeadReq {
 func ExtractSize(res []http.Response) int {
 	size, err := strconv.Atoi(res[0].Header.Get("Content-Length"))
 	if err != nil {
+		log.Fatalf("ERROR: Server does not support partial requests or provide content length.")
 		return 0
 	}
 	return size
