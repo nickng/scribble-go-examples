@@ -380,17 +380,6 @@ func W11Diag(p *Diagonal.Diagonal, N, self session2.Pair, next scributil.ClientC
 func WiiDiag(p *Diagonal.Diagonal, N, self session2.Pair, prev scributil.ServerConn, prevPort int, next scributil.ClientConn, nextHost string, nextPort int, wg *sync.WaitGroup) {
 	WiiDiag := p.New_family_1_W_l1r1toKsubl1r1andl2r2toK(N, self)
 
-	selfnext := self.Plus(session2.XY(1, 1))
-	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
-	if selfnext.Eq(N) {
-		if err := WiiDiag.W_l2r2toK_not_l1r1toKsubl1r1_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
-			log.Fatalf("cannot dial: %v", err)
-		}
-	} else {
-		if err := WiiDiag.W_l1r1toKsubl1r1andl2r2toK_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
-			log.Fatalf("cannot dial: %v", err)
-		}
-	}
 	ln, err := prev.Listen(prevPort)
 	if err != nil {
 		log.Fatalf("cannot listen: %v", err)
@@ -405,6 +394,18 @@ func WiiDiag(p *Diagonal.Diagonal, N, self session2.Pair, prev scributil.ServerC
 	} else {
 		if err := WiiDiag.W_l1r1toKsubl1r1andl2r2toK_Accept(selfprev, ln, prev.Formatter()); err != nil {
 			log.Fatalf("cannot accept: %v", err)
+		}
+	}
+
+	selfnext := self.Plus(session2.XY(1, 1))
+	scributil.Debugf("[connection] W[%s]: dialling to W[%s] at %s:%d.\n", self, selfnext, nextHost, nextPort)
+	if selfnext.Eq(N) {
+		if err := WiiDiag.W_l2r2toK_not_l1r1toKsubl1r1_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
+		}
+	} else {
+		if err := WiiDiag.W_l1r1toKsubl1r1andl2r2toK_Dial(selfnext, nextHost, nextPort, next.Dial, next.Formatter()); err != nil {
+			log.Fatalf("cannot dial: %v", err)
 		}
 	}
 	scributil.Debugf("W[%s]: Ready.\n", self)
