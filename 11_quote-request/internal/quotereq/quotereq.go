@@ -8,10 +8,10 @@ import (
 	"sync"
 
 	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService"
-	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/family_1/Buyer_1to1"
-	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/family_1/Manufacturer_1toM"
-	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/family_1/Supplier_1to1and1toS_not_2toS"
-	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/family_1/Supplier_1toSand2toS_not_1to1"
+	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/Buyer_1to1"
+	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/Manufacturer_1toM"
+	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/Supplier_1to1and1toS_not_2toS"
+	"github.com/nickng/scribble-go-examples/11_quote-request/QuoteRequest/WebService/Supplier_1toSand2toS_not_1to1"
 	"github.com/nickng/scribble-go-examples/11_quote-request/message"
 	"github.com/nickng/scribble-go-examples/scributil"
 )
@@ -23,7 +23,7 @@ func init() {
 
 // Buyer implements Buyer[1].
 func Buyer(p *WebService.WebService, S, self int, supp scributil.ClientConn, host string, basePort int, wg *sync.WaitGroup) {
-	Buyer := p.New_family_1_Buyer_1to1(S, self)
+	Buyer := p.New_Buyer_1to1(S, self)
 
 	for s := 1; s <= S; s++ {
 		scributil.Debugf("[connection] Buyer: dialling to Supplier[%d] at %s:%d.\n", s, host, basePort+s)
@@ -75,7 +75,7 @@ func Buyer(p *WebService.WebService, S, self int, supp scributil.ClientConn, hos
 
 // Supplier1 implements Supplier[1].
 func Supplier1(p *WebService.WebService, M, S, self int, buy scributil.ServerConn, buyPort int, supp scributil.ClientConn, suppHost string, suppBasePort int, manu scributil.ClientConn, manuHost string, manuBasePort int, wg *sync.WaitGroup) {
-	Supplier1 := p.New_family_1_Supplier_1to1and1toS_not_2toS(M, S, self)
+	Supplier1 := p.New_Supplier_1to1and1toS_not_2toS(M, S, self)
 
 	// First connect to Manufacturers.
 	for m := 1; m <= M; m++ {
@@ -146,7 +146,7 @@ func Supplier1(p *WebService.WebService, M, S, self int, buy scributil.ServerCon
 						return *sEnd
 					}
 				}
-			case *Supplier_1to1and1toS_not_2toS.Order_Supplier_State7:
+			case *Supplier_1to1and1toS_not_2toS.Order:
 				var o message.Quote
 				s5 := s4.Recv_Order(&o)
 				sEnd := s5.Manufacturer_1toM_Scatter_Finish()
@@ -159,7 +159,7 @@ func Supplier1(p *WebService.WebService, M, S, self int, buy scributil.ServerCon
 
 // Supplier2toS implements Supplier[2..S].
 func Supplier2toS(p *WebService.WebService, M, S, self int, buy scributil.ServerConn, buyPort int, supp scributil.ServerConn, suppPort int, manu scributil.ClientConn, manuHost string, manuBasePort int, wg *sync.WaitGroup) {
-	Supplier2toS := p.New_family_1_Supplier_1toSand2toS_not_1to1(M, S, self)
+	Supplier2toS := p.New_Supplier_1toSand2toS_not_1to1(M, S, self)
 
 	// First connect to Manufacturers.
 	for m := 1; m <= M; m++ {
@@ -204,7 +204,7 @@ func Supplier2toS(p *WebService.WebService, M, S, self int, buy scributil.Server
 			s2 := s1.Manufacturer_1toM_Gather_Reply(quote)
 			s3 := s2.Buyer_1_Scatter_Reply(quote)
 			switch s4 := s3.Buyer_1_Branch().(type) {
-			case *Supplier_1toSand2toS_not_1to1.Order:
+			case *Supplier_1toSand2toS_not_1to1.Order_Supplier_State5:
 				var o message.Quote
 				sEnd := s4.Recv_Order(&o)
 				return *sEnd
@@ -215,7 +215,7 @@ func Supplier2toS(p *WebService.WebService, M, S, self int, buy scributil.Server
 				case *Supplier_1toSand2toS_not_1to1.Modify_Supplier_State6:
 					var q message.Quote
 					s3 = s6.Recv_Modify(&q)
-				case *Supplier_1toSand2toS_not_1to1.Finish:
+				case *Supplier_1toSand2toS_not_1to1.Finish_Supplier_State6:
 					sEnd := s6.Recv_Finish()
 					return *sEnd
 				case *Supplier_1toSand2toS_not_1to1.Renegotiate_Supplier_State6:
@@ -229,7 +229,7 @@ func Supplier2toS(p *WebService.WebService, M, S, self int, buy scributil.Server
 
 // Manufacturer implements Manufacturer[1..M].
 func Manufacturer(p *WebService.WebService, M, S, self int, supp scributil.ServerConn, suppBasePort int, wg *sync.WaitGroup) {
-	Manufacturer := p.New_family_1_Manufacturer_1toM(M, S, self)
+	Manufacturer := p.New_Manufacturer_1toM(M, S, self)
 
 	wgSvr := new(sync.WaitGroup)
 	wgSvr.Add(S)
@@ -268,7 +268,7 @@ func Manufacturer(p *WebService.WebService, M, S, self int, supp scributil.Serve
 			}
 			s1 := s0.Supplier_1toS_Scatter_Reply(quote)
 			switch s2 := s1.Supplier_1_Branch().(type) {
-			case *Manufacturer_1toM.Finish_Manufacturer_State3:
+			case *Manufacturer_1toM.Finish:
 				sEnd := s2.Recv_Finish()
 				return *sEnd
 			case *Manufacturer_1toM.Renegotiate_Manufacturer_State3:
