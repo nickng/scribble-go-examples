@@ -1,4 +1,4 @@
-//rhu@HZHL4 ~/code/go
+//C:\cygwin64\home\rhu\code\go\src\github.com\nickng\scribble-go-examples>
 //$ go generate C:/cygwin64/home/rhu/code/go/src/github.com/nickng/scribble-go-examples/1_one-to-many/scatter-local-win/main.go
 //$ go install github.com/nickng/scribble-go-examples/1_one-to-many/scatter-local-win
 //$ bin/scatter-local.exe -t=shm
