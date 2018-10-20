@@ -1,3 +1,7 @@
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 17_fibonacci/Fib.scr -d 17_fibonacci -param Fibonacci github.com/nickng/scribble-go-examples/17_fibonacci/Fib -param-api Fib
+
+
+
 // Fibonacci
 
 module Fib;

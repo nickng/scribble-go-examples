@@ -1,3 +1,5 @@
+//$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 7_mesh/Mesh.scr -d 7_mesh -param Mesh1 github.com/nickng/scribble-go-examples/7_mesh/Mesh -param-api W
+
 // Mesh - 2D mesh
 
 module Mesh;
