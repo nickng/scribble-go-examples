@@ -50,7 +50,7 @@ func init() {
 }
 
 // self == K
-func Ring_last(wg *sync.WaitGroup, K int, self int) *WK.End {
+func Server_last(wg *sync.WaitGroup, K int, self int) *WK.End {
 	P1 := RingProto.New()
 	WK := P1.New_family_2_W_3toKandKtoK_not_1to1and2to2and2toKsub1(K, self)
 	var ss transport2.ScribListener
@@ -81,7 +81,7 @@ func runWK(s *WK.Init) WK.End {
 		s2 := c.Recv_Foo(&x)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") received Foo:", x)
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		s = s2.W_1_Scatter_Foo(pay)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
 		return runWK(s)
@@ -90,21 +90,21 @@ func runWK(s *WK.Init) WK.End {
 		s3 := c.Recv_Bar(&x)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") received Bar:", x)
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		end = s3.W_1_Scatter_Bar(pay)
 		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
-                scributil.Delay(1500)
-		fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") finished")
+		scributil.Delay(1500)
+		fmt.Println("WK (" + strconv.Itoa(s.Ept.Self) + ") finished")
 		return *end
 	default:
 		log.Fatal("Shouldn't get in here: ", reflect.TypeOf(c))
 	}
-	fmt.Println("WK ("+strconv.Itoa(s.Ept.Self)+") finished")
+	fmt.Println("WK (" + strconv.Itoa(s.Ept.Self) + ") finished")
 	return *end
 }
 
 // K > 3
-func Ring_mid(wg *sync.WaitGroup, K int, self int) *M.End {
+func ServerClient_mid(wg *sync.WaitGroup, K int, self int) *M.End {
 	P1 := RingProto.New()
 	M := P1.New_family_2_W_2toKsub1and3toK_not_1to1and2to2andKtoK(K, self)
 	var ss transport2.ScribListener
@@ -114,28 +114,28 @@ func Ring_mid(wg *sync.WaitGroup, K int, self int) *M.End {
 	}
 	defer ss.Close()
 
-if self > 2 {
-if err = M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, ss, FORMATTER()); err != nil { // FIXME: shouldn't have
-panic(err)
-}
-} else {
-if err = M.W_1to1_not_2to2and2toKsub1and3toKandKtoK_Accept(self-1, ss, FORMATTER()); err != nil {
-panic(err)
-}
-}
-fmt.Println("M (" + strconv.Itoa(M.Self) + ") accepted", self-1, "on", PORT+self)
+	if self == 2 {
+		if err = M.W_1to1_not_2to2and2toKsub1and3toKandKtoK_Accept(self-1, ss, FORMATTER()); err != nil {
+			panic(err)
+		}
+	} else {
+		if err = M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Accept(self-1, ss, FORMATTER()); err != nil {
+			panic(err)
+		}
+	}
+	fmt.Println("M ("+strconv.Itoa(M.Self)+") accepted", self-1, "on", PORT+self)
 
-if self == K-1 {
-if err := M.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
-panic(err)
-}
-} else {
-if err := M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
-panic(err)
-}
-}
-	
-end := M.Run(runM)
+	if self == K-1 {
+		if err := M.W_3toKandKtoK_not_1to1and2to2and2toKsub1_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
+			panic(err)
+		}
+	} else {
+		if err := M.W_2toKsub1and3toK_not_1to1and2to2andKtoK_Dial(self+1, util.LOCALHOST, PORT+self+1, DIAL, FORMATTER()); err != nil {
+			panic(err)
+		}
+	}
+
+	end := M.Run(runM)
 	wg.Done()
 	return &end
 }
@@ -148,7 +148,7 @@ func runM(s *M.Init) M.End {
 		s2 := c.Recv_Foo(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Foo:", x)
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		s = s2.W_selfplus1_Scatter_Foo(pay)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
 		return runM(s)
@@ -157,21 +157,21 @@ func runM(s *M.Init) M.End {
 		s3 := c.Recv_Bar(&x)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") received Bar:", x)
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		end = s3.W_selfplus1_Scatter_Bar(pay)
 		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") sent Foo:", pay)
-                scributil.Delay(1500)
-		fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") finished")
+		scributil.Delay(1500)
+		fmt.Println("M (" + strconv.Itoa(s.Ept.Self) + ") finished")
 		return *end
 	default:
 		log.Fatal("Shouldn't get in here: ", reflect.TypeOf(c))
 	}
-	fmt.Println("M ("+strconv.Itoa(s.Ept.Self)+") finished")
+	fmt.Println("M (" + strconv.Itoa(s.Ept.Self) + ") finished")
 	return *end
 }
 
 // self == 1
-func Ring_ini(wg *sync.WaitGroup, K int, self int) *W1.End {
+func Client_ini(wg *sync.WaitGroup, K int, self int) *W1.End {
 	P1 := RingProto.New()
 	W1 := P1.New_family_2_W_1to1_not_2to2and2toKsub1and3toKandKtoK(K, self)
 	var ss transport2.ScribListener
@@ -202,7 +202,7 @@ func runW1(s *W1.Init) W1.End {
 	//var end *W1.End
 	if rnd.Intn(2) < 1 {
 		pay := []messages.Foo{messages.Foo{X: s.Ept.Self}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		s2 := s.W_2_Scatter_Foo(pay)
 		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") sent Foo #"+strconv.Itoa(count)+":", pay)
 		s = s2.W_K_Gather_Foo(pay)
@@ -211,13 +211,13 @@ func runW1(s *W1.Init) W1.End {
 		return runW1(s)
 	} else {
 		pay := []messages.Bar{messages.Bar{Y: strconv.Itoa(s.Ept.Self)}}
-                scributil.Delay(1500)
+		scributil.Delay(1500)
 		s3 := s.W_2_Scatter_Bar(pay)
 		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") sent Bar:", pay)
 		end := s3.W_K_Gather_Bar(pay)
 		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") received:", pay)
-                scributil.Delay(1500)
-		fmt.Println("W1 ("+strconv.Itoa(s.Ept.Self)+") finished")
+		scributil.Delay(1500)
+		fmt.Println("W1 (" + strconv.Itoa(s.Ept.Self) + ") finished")
 		return *end
 	}
 }

@@ -104,6 +104,7 @@ func ParseFlags() (cparam ConnParam, K int) {
 	flag.StringVar(&tran, "t", tcpTran, "transport: tcp/shm")
 	flag.IntVar(&port, "port", defaultPort, "base port for sever sockets")
 	flag.IntVar(&param, "K", 2, "K parameter value")
+	//flag.IntVar(&param, "self", 1, "Self id")
 	flag.Parse()
 
 	Debugf("[info] Transport selected: %s\n", tran)

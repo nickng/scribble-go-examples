@@ -1,3 +1,7 @@
+//rhu@HZHL4 ~/code/go
+//$ go install github.com/nickng/scribble-go-examples/5_ring/ring_mid
+//$ bin/ring_mid.exe -K=4 -I=3
+
 //go:generate scribblec-param.sh ../Ring.scr -d .. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
 
 package main
@@ -50,7 +54,7 @@ func main() {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 
-	ring.Ring_mid(wg, K, I)
+	ring.ServerClient_mid(wg, K, I)
 
 	wg.Wait()
 }

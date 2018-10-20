@@ -1,3 +1,7 @@
+//rhu@HZHL4 ~/code/go
+//$ go install github.com/nickng/scribble-go-examples/5_ring/ring_last
+//$ bin/ring_last.exe -K=4
+
 //go:generate scribblec-param.sh ../Ring.scr -d .. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
 
 package main
@@ -47,7 +51,7 @@ func main() {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 
-	ring.Ring_last(wg, K, K)
+	ring.Server_last(wg, K, K)
 
 	wg.Wait()
 }
