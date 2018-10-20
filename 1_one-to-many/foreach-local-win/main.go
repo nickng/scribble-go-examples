@@ -1,7 +1,7 @@
 // +build windows
 
 //rhu@HZHL4 ~/code/go
-//$ go generate C:/cygwin64/home/rhu/code/go/src/github.com/nickng/scribble-go-examples/1_one-to-many/foreach-local/main.go
+//$ go generate C:/cygwin64/home/rhu/code/go/src/github.com/nickng/scribble-go-examples/1_one-to-many/foreach-local-win/main.go
 //$ go install github.com/nickng/scribble-go-examples/1_one-to-many/foreach-local
 //$ bin\foreach-local.exe -t=shm -K=4
 
