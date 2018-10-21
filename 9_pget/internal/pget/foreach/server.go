@@ -78,7 +78,9 @@ func serverBody(s *S.Init) S.End {
 	}
 	s1 := s0.F_1_Scatter_Res(res)
 	scributil.Debugf("S: sent %v.\n", res)
-	sEnd := s1.Foreach(nestedS)
+	sEnd := s1.
+			//Foreach(nestedS)
+			Parallel(nestedS)
 	return *sEnd
 }
 

@@ -1,5 +1,7 @@
 //$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 9_pget/PGet.scr -d 9_pget -param Sync github.com/nickng/scribble-go-examples/9_pget/PGet -param-api A -param-api B
+
 //$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 9_pget/PGet.scr -d 9_pget -param Basic github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
+
 //$ ~/code/eclipse/scribble/github.com/rhu1-go/scribble-java/bin/scribblec-param.sh 9_pget/PGet.scr -d 9_pget -param Foreach github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
 
 module PGet;

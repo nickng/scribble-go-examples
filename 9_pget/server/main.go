@@ -1,3 +1,5 @@
+// FIXME: refactor inside "foreach" -- this server specifically implements the Foreach protocol
+
 package main
 
 import (
@@ -12,7 +14,7 @@ import (
 var (
 	// K is the number of fetchers.
 	K int
-	// URL is the URL to fetch.
+	// URL is the URL to fetch. -- N.B. for server, this is only used to set the port
 	URL string
 )
 
@@ -27,6 +29,7 @@ func init() {
 		os.Exit(2)
 	}
 }
+
 func main() {
 	flag.Parse()
 	if flag.NArg() < 1 {
