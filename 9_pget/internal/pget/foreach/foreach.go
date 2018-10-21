@@ -81,11 +81,11 @@ func initM(M1 *M_1to1.M_1to1, wg *sync.WaitGroup, K int) {
 func initF1(F *F_1to1and1toK.F_1to1and1toK, shost string, sport int, mln transport2.ScribListener, wg *sync.WaitGroup) {
 	pget.Debugf("F[1]: Connecting with S[1] and M[1].\n")
 	defer wg.Done()
-	if err := F.S_1to1_Dial(1, shost, sport, tcp.Dial, new(http.Formatter)); err != nil {
-		log.Fatalf("cannot dial from F to S: %v", err)
-	}
 	if err := F.M_1to1_Accept(1, mln, new(session2.PassByPointer)); err != nil {
 		log.Fatalf("cannot accept connection from M to F: %v", err)
+	}
+	if err := F.S_1to1_Dial(1, shost, sport, tcp.Dial, new(http.Formatter)); err != nil {
+		log.Fatalf("cannot dial from F to S: %v", err)
 	}
 	pget.Debugf("F[1]: Ready.\n")
 	F.Run(F1)
