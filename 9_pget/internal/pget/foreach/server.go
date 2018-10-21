@@ -14,20 +14,13 @@ import (
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 )
 
-var (
-	// URL is the URL to fetch.
-	URLserver string
-)
-
 func RunServer(K int, URL string) {
-	URLserver = URL
-
-	httpHost, httpPort := pget.ParseURL(URL)
+	_, httpPort := pget.ParseURL(URL)
 
 	protocol := Foreach.New()
 	S := protocol.New_family_1_S_1to1(K, 1)
 
-	ln, err := tcp.Listen(80)
+	ln, err := tcp.Listen(httpPort)
 	if err != nil {
 		log.Fatalf("cannot listen: %v", err)
 	}
@@ -49,8 +42,8 @@ func RunServer(K int, URL string) {
 }
 
 func serverBody(s *S.Init) S.End {
-	s0 := s.F_1_Gather_Head(..TODO..)
-	s1 := s0.F_1_Scatter_Res(..TODO..)
+	s0 := s.F_1_Gather_Head(/*FIXME*/)
+	s1 := s0.F_1_Scatter_Res(/*FIXME*/)
 	/*s2 := s1.F_1toK_Gather_Get()
 	sEnd := s2.F_1toK_Scatter_Res()*/
 	sEnd := s1.Foreach(nestedS)
@@ -58,7 +51,7 @@ func serverBody(s *S.Init) S.End {
 }
 
 func nestedS(s *S.Init_49) S.End {
-	return *s.F_I_Gather_Get(..TODO..).F_I_Scatter_Res(..TODO..)
+	return *s.F_I_Gather_Get(/*FIXME*/).F_I_Scatter_Res(/*FIXME*/)
 }
 
 // HTTPFormatter is a server-side HTTP formatter.
