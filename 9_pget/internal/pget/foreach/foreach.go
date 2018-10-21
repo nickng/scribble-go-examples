@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach"
 	"github.com/nickng/scribble-go-examples/9_pget/PGet/Foreach/family_1/F_1to1and1toK"
@@ -64,6 +65,7 @@ func initM(M1 *M_1to1.M_1to1, wg *sync.WaitGroup, K int) {
 	if err := M1.F_1to1and1toK_Dial(1, "inmem", 0, shm.Dial, new(session2.PassByPointer)); err != nil {
 		log.Fatalf("cannot dial from M to F[1]: %v", err)
 	}
+	time.Sleep(100 * time.Millisecond)
 	for i := 2; i <= K; i++ {
 		port := i - 1
 		if err := M1.F_1toK_not_1to1_Dial(i, "inmem", port, shm.Dial, new(session2.PassByPointer)); err != nil {
