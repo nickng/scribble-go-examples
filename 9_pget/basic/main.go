@@ -12,7 +12,9 @@ import "github.com/nickng/scribble-go-examples/9_pget/internal/pget/basic"
 
 
 var (
+	// K is the number of fetchers.
 	K int
+	// URL is the URL to fetch.
 	URL string
 )
 
