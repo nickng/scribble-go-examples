@@ -50,7 +50,7 @@ func RunServer(K int, URL string) {
 
 func serverBody(s *S.Init) S.End {
 	s0 := s.F_1_Gather_Head(..TODO..)
-	s1 := s0.F_1_Scatter_Res..TODO..()
+	s1 := s0.F_1_Scatter_Res(..TODO..)
 	/*s2 := s1.F_1toK_Gather_Get()
 	sEnd := s2.F_1toK_Scatter_Res()*/
 	sEnd := s1.Foreach(nestedS)
