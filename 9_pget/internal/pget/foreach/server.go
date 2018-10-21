@@ -39,7 +39,7 @@ func RunServer(K int, URL string) {
 	mu := new(sync.Mutex)
 	for i := 1; i <= K; i++ {
 		if i == 1 {
-			go func(i int) {
+			//go func(i int) {
 				scributil.Debugf("S: listening for F[%d] at :%d.\n", i, httpPort)
 				mu.Lock()
 				if err := S.F_1to1and1toK_Accept(i, ln, new(HTTPFormatter)); err != nil {
@@ -47,9 +47,9 @@ func RunServer(K int, URL string) {
 				}
 				mu.Unlock()
 				wgSvr.Done()
-			}(i)
+			//}(i)
 		} else {
-			go func(i int) {
+			//go func(i int) {
 				scributil.Debugf("S: listening for F[%d] at :%d.\n", i, httpPort)
 				mu.Lock()
 				if err := S.F_1toK_not_1to1_Accept(i, ln, new(HTTPFormatter)); err != nil {
@@ -57,7 +57,7 @@ func RunServer(K int, URL string) {
 				}
 				mu.Unlock()
 				wgSvr.Done()
-			}(i)
+			//}(i)
 		}
 	}
 	wgSvr.Wait()
@@ -79,8 +79,8 @@ func serverBody(s *S.Init) S.End {
 	s1 := s0.F_1_Scatter_Res(res)
 	scributil.Debugf("S: sent %v.\n", res)
 	sEnd := s1.
-			//Foreach(nestedS)
-			Parallel(nestedS)
+			Foreach(nestedS)
+			//Parallel(nestedS)
 	return *sEnd
 }
 
