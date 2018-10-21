@@ -1,12 +1,13 @@
 package main
 
-import "flag"
-import "fmt"
-import "log"
-import "os"
+import (
+	"flag"
+	"fmt"
+	"log"
+	"os"
 
-import "github.com/nickng/scribble-go-examples/9_pget/internal/pget/foreach"
-
+	"github.com/nickng/scribble-go-examples/9_pget/internal/pget/foreach"
+)
 
 var (
 	// K is the number of fetchers.
@@ -26,7 +27,6 @@ func init() {
 		os.Exit(2)
 	}
 }
-
 func main() {
 	flag.Parse()
 	if flag.NArg() < 1 {
@@ -34,5 +34,5 @@ func main() {
 	}
 	URL = flag.Arg(0)
 
-	foreach.RunClient(K, URL)	
+	foreach.RunServer(K, URL)
 }
