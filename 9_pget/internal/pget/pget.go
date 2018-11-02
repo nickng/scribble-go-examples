@@ -58,6 +58,7 @@ func MakeHeadReq(url string) []http.HeadReq {
 func ExtractSize(res []http.Response) int {
 	size, err := strconv.Atoi(res[0].Header.Get("Content-Length"))
 	if err != nil {
+		log.Fatalf("ERROR: Server does not support partial requests or provide content length.")
 		return 0
 	}
 	return size
@@ -82,9 +83,10 @@ func MakeJobs(meta []msg.Meta, K int) []msg.Job {
 	for i := 0; i < K; i++ {
 		jobs[i].URL = meta[0].URL
 		jobs[i].RangeFrom = i * fragSize
-		if i < K {
+		if i < K-1 {
 			jobs[i].RangeTo = (i+1)*fragSize - 1
 		} else {
+			// The last fetcher fetches the rest.
 			jobs[i].RangeTo = meta[0].Size
 		}
 	}
