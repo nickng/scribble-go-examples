@@ -45,7 +45,6 @@ import (
 	"os"
 	"regexp"
 	"runtime"
-	"sync"
 	"time"
 
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto"
@@ -150,22 +149,14 @@ func main() {
 
 	prot := Proto.New()
 	mini := prot.New_A_1to1(nCPU, 1)
-	wg := new(sync.WaitGroup)
-	wg.Add(len(connB) + 1)
 	for i := range connB {
-		go func(i int) {
-			if err := mini.B_1toK_Accept(i+1, connB[i], new(session.PassByPointer)); err != nil {
-				log.Fatal(err)
-			}
-			wg.Done()
-		}(i)
-	}
-	go func() {
-		if err := mini.C_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
+		if err := mini.B_1toK_Dial(i+1, "_", i+1, shm.Dial, new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
-		wg.Done()
-	}()
+	}
+	if err := mini.C_1to1_Dial(1, "_", nCPU+2, shm.Dial, new(session.PassByPointer)); err != nil {
+		log.Fatal(err)
+	}
 
 	// main session initiated, main function created
 	mmain := func() {
@@ -176,7 +167,7 @@ func main() {
 	bb := bytes
 
 	cini := prot.New_C_1to1(1)
-	if err := cini.A_1to1_Dial(1, "_", nCPU+2, shm.Dial, new(session.PassByPointer)); err != nil {
+	if err := cini.A_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -187,7 +178,7 @@ func main() {
 
 	mkbmain := func(idx int) func() {
 		bini := prot.New_B_1toK(nCPU, idx+1)
-		if err := bini.A_1to1_Dial(1, "_", idx+1, shm.Dial, new(session.PassByPointer)); err != nil {
+		if err := bini.A_1to1_Accept(1, connB[idx], new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 		return func() {
@@ -199,7 +190,6 @@ func main() {
 	for idx := 0; idx < nCPU; idx++ {
 		bmains[idx] = mkbmain(idx)
 	}
-	wg.Wait()
 
 	// Launch workers. Unlike in the first program, they stop at the first
 	// receive until master distributes tasks.

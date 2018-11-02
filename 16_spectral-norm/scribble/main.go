@@ -44,7 +44,6 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
-	"sync"
 
 	"runtime"
 	"time"
@@ -103,15 +102,10 @@ func main() {
 	// instantiate protocol
 	prot := Proto.New()
 	mini := prot.New_A_1to1(*nCPU, 1)
-	wg := new(sync.WaitGroup)
-	wg.Add(len(conns))
 	for i := range conns {
-		go func(i int) {
-			if err := mini.B_1toK_Accept(i+1, conns[i], new(session.PassByPointer)); err != nil {
-				log.Fatal(err)
-			}
-			wg.Done()
-		}(i)
+		if err := mini.B_1toK_Dial(i+1, "_", i+1, shm.Dial, new(session.PassByPointer)); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	var x Vec
@@ -123,7 +117,7 @@ func main() {
 	// instantiate workers with sub-roles
 	workerInitialise := func(idx int) func() {
 		ini := prot.New_B_1toK(*nCPU, idx+1)
-		if err := ini.A_1to1_Dial(1, "_", idx+1, shm.Dial, new(session.PassByPointer)); err != nil {
+		if err := ini.A_1to1_Accept(1, conns[idx], new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 		return func() {
@@ -135,7 +129,6 @@ func main() {
 	for i := 0; i < *nCPU; i++ {
 		workers[i] = workerInitialise(i)
 	}
-	wg.Wait()
 	for i := 0; i < *nCPU; i++ {
 		go workers[i]()
 	}

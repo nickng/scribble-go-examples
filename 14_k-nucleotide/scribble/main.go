@@ -47,7 +47,6 @@ import (
 	"os"
 	"runtime"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/nickng/scribble-go-examples/14_k-nucleotide/KNuc/Proto"
@@ -167,23 +166,15 @@ func main() {
 	// instantiate protocol
 	prot := Proto.New()
 	mini := prot.New_A_1to1(nCPU, 1)
-	wg := new(sync.WaitGroup)
-	wg.Add(len(connS) + len(connB))
 	for i := range connS {
-		go func(i int) {
-			if err := mini.S_1to2_Accept(i+1, connS[i], new(session.PassByPointer)); err != nil {
-				log.Fatal(err)
-			}
-			wg.Done()
-		}(i)
+		if err := mini.S_1to2_Dial(i+1, "_", i+1, shm.Dial, new(session.PassByPointer)); err != nil {
+			log.Fatal(err)
+		}
 	}
 	for i := range connB {
-		go func(i int) {
-			if err := mini.B_1toK_Accept(i+1, connB[i], new(session.PassByPointer)); err != nil {
-				log.Fatal(err)
-			}
-			wg.Done()
-		}(i)
+		if err := mini.B_1toK_Dial(i+1, "_", i+3, shm.Dial, new(session.PassByPointer)); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// main session initiated, main function created
@@ -195,7 +186,7 @@ func main() {
 
 	sorterInitialise := func(idx int) func() {
 		ini := prot.New_S_1to2(idx + 1)
-		ini.A_1to1_Dial(1, "_", 1+idx, shm.Dial, new(session.PassByPointer)) // A_idx-S
+		ini.A_1to1_Accept(1, connS[idx], new(session.PassByPointer)) // A_idx-S
 		return func() {
 			ini.Run(sorter(idx, str, inp[idx]))
 		}
@@ -205,7 +196,7 @@ func main() {
 
 	workerInitialise := func(idx int) func() {
 		ini := prot.New_B_1toK(nCPU, idx+1)
-		ini.A_1to1_Dial(1, "_", 3+idx, shm.Dial, new(session.PassByPointer)) // B_idx-A
+		ini.A_1to1_Accept(1, connB[idx], new(session.PassByPointer)) // B_idx-A
 		return func() {
 			ini.Run(worker(str))
 		}
@@ -214,7 +205,6 @@ func main() {
 	for idx := 0; idx < nCPU; idx++ {
 		workers[idx] = workerInitialise(idx)
 	}
-	wg.Wait()
 
 	// run sorters + workers
 	go sorter1()
