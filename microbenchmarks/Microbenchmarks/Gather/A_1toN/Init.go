@@ -11,7 +11,7 @@ Ept *A_1toN
 
 
 
-func (s *Init) B_1to1_Scatter_Int(arg0 []message.Int) *End {
+func (s *Init) B_1_Scatter_Int(arg0 []message.Int) *End {
 if s.Err != nil {
 panic(s.Err)
 }

@@ -1,0 +1,23 @@
+module NBody;
+
+// This is a protocol for n-body simulation
+// using a ring topology.
+
+sig <go> "message.Particles" from "github.com/nickng/scribble-go-examples/12_nbody/message" as Particles;
+sig <go> "message.Stop" from "github.com/nickng/scribble-go-examples/12_nbody/message" as Stop;
+
+global protocol NBody(role W) {
+  choice at W[1] {
+    Particles from W[1] to W[2];
+    foreach W[I:2,K-1], W[J:3,K] {
+      Particles from W[I] to W[J];
+    }
+    Particles from W[K] to W[1];
+    do NBody(W);
+  } or {
+    Stop from W[1] to W[2];
+    foreach W[I:2,K-1], W[J:3,K] {
+      Stop from W[I] to W[J];
+    }
+  }
+}

@@ -22,7 +22,7 @@ func initSM(t testing.TB, Count, M, N int) (roles []rolesAlltoall, cleanupFn fun
 		roles[c].BN = make([]*B_1toN.B_1toN, N)
 		// ---- Protocol initialisation ----
 		for m := 0; m < M; m++ {
-			roles[c].AM[m] = prot.New_A_1toM(N, M, m+1)
+			roles[c].AM[m] = prot.New_A_1toM(M, N, m+1)
 			roles[c].AM[m].Params["M"] = M
 			roles[c].AM[m].Params["N"] = N
 		}
@@ -34,9 +34,9 @@ func initSM(t testing.TB, Count, M, N int) (roles []rolesAlltoall, cleanupFn fun
 		// ---- Protocol initialisation END ----
 	}
 	var err error
-	lnMN := make([][]*shm.Listener, M)
+	lnMN := make([][]*shm.ShmListener, M)
 	for m := 0; m < M; m++ {
-		lnMN[m] = make([]*shm.Listener, N)
+		lnMN[m] = make([]*shm.ShmListener, N)
 		for n := 0; n < N; n++ {
 			lnMN[m][n], err = shm.Listen(m*N + n)
 			if err != nil {

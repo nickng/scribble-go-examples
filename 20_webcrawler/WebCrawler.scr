@@ -1,0 +1,22 @@
+module WebCrawler;
+
+// This example is based on WebCrawler protocol from
+//
+//   Let It Recover: Multiparty Protocol-Induced Recovery
+//   by Neykova and Yoshida, CC 2017
+//
+// Downloader[i:1..N] -> Parser[i]: parse;
+// Parser[i] -> Indexer: index;
+// Indexer -> Master: url
+
+sig <go> "message.Parse" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as Parse;
+sig <go> "message.Index" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as Index;
+sig <go> "message.URL" from "github.com/nickng/scribble-go-examples/20_webcrawler/message" as URL;
+
+global protocol Crawler(role Downloader, role Parser, role Indexer, role Master) {
+    foreach Downloader[I:1,N], Parser[J:1,N] {
+        Parse from Downloader[I] to Parser[J];
+    }
+    Index from Parser[1,N] to Indexer[1];
+    URL from Indexer[1] to Master[1];
+}

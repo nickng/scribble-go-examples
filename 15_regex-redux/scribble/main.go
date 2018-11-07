@@ -48,11 +48,11 @@ import (
 	"time"
 
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto"
+	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/A_1to1"
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/B_1toK"
 	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/C_1to1"
-	"github.com/nickng/scribble-go-examples/15_regex-redux/Regex/Proto/family_1/A_1to1"
-	"github.com/nickng/scribble-go-runtime/runtime/transport2/shm"
 	session "github.com/rhu1/scribble-go-runtime/runtime/session2"
+	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 )
 
 var allvariants = []string{
@@ -139,7 +139,7 @@ func main() {
 	// They are generated once, and stored in a slice. The original code creates
 	// the necessary channels just before running the corresponding worker.
 
-	connB := make([]*shm.Listener, nCPU) // [1: B1-A, 2: B2-A, ...]
+	connB := make([]*shm.ShmListener, nCPU) // [1: B1-A, 2: B2-A, ...]
 	for i := 0; i < nCPU; i++ {
 		connB[i], err = shm.Listen(i + 1)
 		defer connB[i].Close()
@@ -148,13 +148,13 @@ func main() {
 	defer connC.Close()
 
 	prot := Proto.New()
-	mini := prot.New_family_1_A_1to1(nCPU, 1)
-	for i, conn := range connB {
-		if err := mini.B_1toK_Accept(i+1, conn, new(session.PassByPointer)); err != nil {
+	mini := prot.New_A_1to1(nCPU, 1)
+	for i := range connB {
+		if err := mini.B_1toK_Dial(i+1, "_", i+1, shm.Dial, new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 	}
-	if err := mini.C_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
+	if err := mini.C_1to1_Dial(1, "_", nCPU+2, shm.Dial, new(session.PassByPointer)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -167,7 +167,7 @@ func main() {
 	bb := bytes
 
 	cini := prot.New_C_1to1(1)
-	if err := cini.A_1to1_Dial(1, "_", nCPU+2, shm.Dial, new(session.PassByPointer)); err != nil {
+	if err := cini.A_1to1_Accept(1, connC, new(session.PassByPointer)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -178,7 +178,7 @@ func main() {
 
 	mkbmain := func(idx int) func() {
 		bini := prot.New_B_1toK(nCPU, idx+1)
-		if err := bini.A_1to1_Dial(1, "_", idx+1, shm.Dial, new(session.PassByPointer)); err != nil {
+		if err := bini.A_1to1_Accept(1, connB[idx], new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 		return func() {
@@ -209,12 +209,12 @@ func main() {
 func substr(bb []byte) func(*C_1to1.Init) C_1to1.End {
 	return func(s0 *C_1to1.Init) C_1to1.End {
 		measures := make([]int, 1, 1)
-		s1 := s0.A_1to1_Gather_Measure(measures)
+		s1 := s0.A_1_Gather_Measure(measures)
 		/*** Exactly as base program, after Measure() for synchronisation ***/
 		for _, sub := range substs {
 			bb = regexp.MustCompile(sub.pat).ReplaceAll(bb, []byte(sub.repl))
 		}
-		end := s1.A_1to1_Scatter_Len([]int{len(bb)})
+		end := s1.A_1_Scatter_Len([]int{len(bb)})
 		return *end
 	}
 }
@@ -224,8 +224,8 @@ func worker(bytes []byte) func(*B_1toK.Init) B_1toK.End {
 		// Count receives variant, and calls countMatches, just as the original
 		// program. The result is sent using Donec, instead of a custom channel.
 		counts := make([]string, 1, 1)
-		s1 := s0.A_1to1_Gather_Count(counts)
-		end := s1.A_1to1_Scatter_Donec([]int{countMatches(counts[0], bytes)})
+		s1 := s0.A_1_Gather_Count(counts)
+		end := s1.A_1_Scatter_Donec([]int{countMatches(counts[0], bytes)})
 		return *end
 	}
 }
@@ -238,7 +238,7 @@ func master(ilen, clen int, variants []string) func(*A_1to1.Init) A_1to1.End {
 
 		// After workers received the interest variants,
 		// measure sends a token to worker C to continue
-		s2 := s1.C_1to1_Scatter_Measure([]int{0})
+		s2 := s1.C_1_Scatter_Measure([]int{0})
 
 		// Wait for workers to finish and gather results.
 		// Original program does not need this, since the receives are done
@@ -246,7 +246,7 @@ func master(ilen, clen int, variants []string) func(*A_1to1.Init) A_1to1.End {
 		rs := make([]int, nCPU, nCPU)
 		s3 := s2.B_1toK_Gather_Donec(rs)
 		lens := make([]int, 1, 1)
-		end := s3.C_1to1_Gather_Len(lens)
+		end := s3.C_1_Gather_Len(lens)
 
 		for i, c := range rs {
 			fmt.Fprintf(ioutil.Discard, "%s %d\n", variants[i], c)

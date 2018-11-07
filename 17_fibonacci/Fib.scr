@@ -2,11 +2,11 @@
 
 module Fib;
 
-sig <go> "message.Val" from "github.com/nickng/scribble-go-examples/17_fibonacci/message" as Val;
+type <go> "int" from "builtin" as int;
 
 global protocol Fibonacci(role Fib) {
   foreach Fib[I2:1,K-2], Fib[I1:2,K-1], Fib[I:3,K] {
-    Val from Fib[I2] to Fib[I];
-    Val from Fib[I1] to Fib[I];
+    T(int) from Fib[I2] to Fib[I];
+    T(int) from Fib[I1] to Fib[I];
   }
 }

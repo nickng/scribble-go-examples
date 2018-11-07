@@ -13,8 +13,8 @@ func New() *Alltoall {
 return &Alltoall{ }
 }
 
-func (p *Alltoall) New_A_1toM(N int, M int, self int) *A_1toM.A_1toM {
-return A_1toM.New(p, N, M, self)
+func (p *Alltoall) New_A_1toM(M int, N int, self int) *A_1toM.A_1toM {
+return A_1toM.New(p, M, N, self)
 }
 
 func (p *Alltoall) New_B_1toN(M int, N int, self int) *B_1toN.B_1toN {

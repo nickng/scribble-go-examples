@@ -5,8 +5,8 @@ module Hadamard;
 sig <go> "message.Val" from "github.com/nickng/scribble-go-examples/6_hadamard/message" as Val;
 
 global protocol Hadamard(role A, role B, role C) {
-  foreach A[I:(1,1),(W,H)], B[I:(1,1),(W,H)], C[I:(1,1),(W,H)] {
-    Val from A[I] to C[I];
-    Val from B[I] to C[I];
+  foreach A[I1:(1,1),K], B[I2:(1,1),K], C[I:(1,1),K] {
+    Val from A[I1] to C[I];
+    Val from B[I2] to C[I];
   }
 }

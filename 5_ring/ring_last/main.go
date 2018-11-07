@@ -1,4 +1,5 @@
 //go:generate scribblec-param.sh ../Ring.scr -d .. -param RingProto github.com/nickng/scribble-go-examples/5_ring/Ring -param-api W
+
 package main
 
 import (
@@ -10,25 +11,24 @@ import (
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 
+	"github.com/nickng/scribble-go-examples/5_ring/internal/ring"
 	"github.com/nickng/scribble-go-examples/5_ring/messages"
-	"github.com/nickng/scribble-go-examples/5_ring/ring"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
-
 
 var _ = shm.Dial
 var _ = tcp.Dial
 
-
 //*
 var LISTEN = tcp.Listen
 var DIAL = tcp.Dial
-var FORMATTER = func() *session2.GobFormatter { return new(session2.GobFormatter) } 
+var FORMATTER = func() *session2.GobFormatter { return new(session2.GobFormatter) }
+
 /*/
 var LISTEN = shm.Listen
 var DIAL = shm.Dial
-var FORMATTER = func() *session2.PassByPointer { return new(session2.PassByPointer) } 
+var FORMATTER = func() *session2.PassByPointer { return new(session2.PassByPointer) }
 //*/
-
 
 const PORT = 8888
 
@@ -39,11 +39,10 @@ func init() {
 	gob.Register(&bar)
 }
 
-
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	K := 4  // K >= 3
+	_, K := scributil.ParseFlags() // K >= 3
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

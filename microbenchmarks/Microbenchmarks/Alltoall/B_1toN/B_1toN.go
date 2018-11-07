@@ -1,4 +1,6 @@
 package B_1toN
+//[A{[1,M]}, B{[1,N]}]
+
 
 import "github.com/rhu1/scribble-go-runtime/runtime/session2"
 import "github.com/rhu1/scribble-go-runtime/runtime/transport2"
@@ -38,6 +40,10 @@ func (ini *B_1toN) A_1toM_Accept(id int, ss transport2.ScribListener, sfmt sessi
 defer ini.MPChan.ConnWg.Done()
 ini.MPChan.ConnWg.Add(1)
 c, err := ss.Accept()
+if err != nil {
+return err
+}
+
 sfmt.Wrap(c)
 ini.MPChan.Conns["A"][id] = c
 ini.MPChan.Fmts["A"][id] = sfmt
@@ -48,6 +54,10 @@ func (ini *B_1toN) A_1toM_Dial(id int, host string, port int, dialler func (stri
 defer ini.MPChan.ConnWg.Done()
 ini.MPChan.ConnWg.Add(1)
 c, err := dialler(host, port)
+if err != nil {
+return err
+}
+
 sfmt.Wrap(c)
 ini.MPChan.Conns["A"][id] = c
 ini.MPChan.Fmts["A"][id] = sfmt
@@ -55,8 +65,16 @@ return err
 }
 
 func (ini *B_1toN) Run(f func(*Init) End) End {
-//defer ini.MPChan.Close()
+defer ini.Close()
+return f(ini.Init())
+}
+
+func (ini *B_1toN) Init() *Init {
 ini.Use()
 ini.MPChan.CheckConnection()
-return f(ini._Init)
+return ini._Init
+}
+
+func (ini *B_1toN) Close() {
+defer ini.MPChan.Close()
 }

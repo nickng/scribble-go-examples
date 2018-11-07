@@ -4,13 +4,15 @@ import (
 	"encoding/gob"
 	"log"
 	"sync"
+	"flag"
 
 	"github.com/rhu1/scribble-go-runtime/runtime/session2"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/shm"
 	"github.com/rhu1/scribble-go-runtime/runtime/transport2/tcp"
 
 	"github.com/nickng/scribble-go-examples/4_pipeline/messages"
-	"github.com/nickng/scribble-go-examples/4_pipeline/pipeline"
+	"github.com/nickng/scribble-go-examples/4_pipeline/internal/pipeline"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
 var _ = shm.Dial
@@ -41,14 +43,14 @@ func init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	K := 4
+  var I int
+  flag.IntVar(&I, "I", -1, "self ID (2 <= I <= K)")
+	_, K := scributil.ParseFlags()
 
 	wg := new(sync.WaitGroup)
-	wg.Add(K-2)
+	wg.Add(1)
 
-	for j := 2; j <= K-1; j++ {
-		go pipeline.Server_middle(wg, K, j)
-	}
+	pipeline.Server_middle(wg, K, I)
 
 	wg.Wait()
 }

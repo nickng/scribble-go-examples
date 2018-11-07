@@ -93,7 +93,7 @@ func main() {
 	}
 	v := make(Vec, N)
 
-	conns := make([]*shm.Listener, *nCPU) // [1: A-B1, 2: A-B2, ...]
+	conns := make([]*shm.ShmListener, *nCPU) // [1: A-B1, 2: A-B2, ...]
 	for i := range conns {
 		conns[i], err = shm.Listen(i + 1)
 		defer conns[i].Close()
@@ -102,8 +102,8 @@ func main() {
 	// instantiate protocol
 	prot := Proto.New()
 	mini := prot.New_A_1to1(*nCPU, 1)
-	for i, conn := range conns {
-		if err := mini.B_1toK_Accept(i+1, conn, new(session.PassByPointer)); err != nil {
+	for i := range conns {
+		if err := mini.B_1toK_Dial(i+1, "_", i+1, shm.Dial, new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -117,7 +117,7 @@ func main() {
 	// instantiate workers with sub-roles
 	workerInitialise := func(idx int) func() {
 		ini := prot.New_B_1toK(*nCPU, idx+1)
-		if err := ini.A_1to1_Dial(1, "_", idx+1, shm.Dial, new(session.PassByPointer)); err != nil {
+		if err := ini.A_1to1_Accept(1, conns[idx], new(session.PassByPointer)); err != nil {
 			log.Fatal(err)
 		}
 		return func() {
@@ -143,19 +143,19 @@ func worker(i int, u, v Vec, x *Vec) func(*B_1toK.Init) B_1toK.End {
 		var buf = []int{0} // container for received message
 		var pl int
 		for {
-			switch s1 := s0.A_1to1_Branch().(type) {
+			switch s1 := s0.A_1_Branch().(type) {
 			case *B_1toK.Times:
 				// x.Times u followed by v.TimesTransp x
 				s2 := s1.Recv_Times(&pl)
 				(*x).Times(i*len(v) / *nCPU, (i+1)*len(v) / *nCPU, u)
 				// tell master we are done
 				s3 := s2.
-					A_1to1_Scatter_Done(buf).
-					A_1to1_Gather_Next(buf)
+					A_1_Scatter_Done(buf).
+					A_1_Gather_Next(buf)
 				v.TimesTransp(i*len(v) / *nCPU, (i+1)*len(v) / *nCPU, *x)
 				s4 := s3.
-					A_1to1_Scatter_Done(buf).
-					A_1to1_Gather_TimeStr(buf)
+					A_1_Scatter_Done(buf).
+					A_1_Gather_TimeStr(buf)
 
 				// now we are doing a u.TimesTransp(v),
 				// so u and v should be reversed in the operations.
@@ -163,13 +163,13 @@ func worker(i int, u, v Vec, x *Vec) func(*B_1toK.Init) B_1toK.End {
 
 				(*x).Times(i*len(u) / *nCPU, (i+1)*len(u) / *nCPU, v)
 				s5 := s4.
-					A_1to1_Scatter_Done(buf).
-					A_1to1_Gather_Next(buf)
+					A_1_Scatter_Done(buf).
+					A_1_Gather_Next(buf)
 				u.TimesTransp(i*len(u) / *nCPU, (i+1)*len(u) / *nCPU, *x)
 				s0 = s5.
-					A_1to1_Scatter_Done(buf)
-			case *B_1toK.End:
-				end := s1.Recv_End(&pl)
+					A_1_Scatter_Done(buf)
+			case *B_1toK.Finish:
+				end := s1.Recv_Finish(&pl)
 				// last iteration
 				return *end
 			}
@@ -210,7 +210,7 @@ func master(N int, u, v Vec, x *Vec) func(*A_1to1.Init) A_1to1.End {
 		fmt.Fprintf(ioutil.Discard, "%0.9f\n", math.Sqrt(vBv/vv))
 
 		// finalise
-		end := s0.B_1toK_Scatter_End(pl)
+		end := s0.B_1toK_Scatter_Finish(pl)
 		return *end
 	}
 }

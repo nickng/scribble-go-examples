@@ -2,39 +2,27 @@
 //$ go install github.com/nickng/scribble-go-examples/1_one-to-many/foreach-local
 //$ bin/foreach-local.exe -t=shm
 
-//go:generate scribblec-param.sh ../OneToMany.scr -d ../ -param Scatter github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany -param-api A -param-api B
-
-
 package main
 
 import (
-	"encoding/gob"
 	"sync"
 	"time"
 
-	"github.com/nickng/scribble-go-examples/scributil"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/OneToMany/Foreach"
-	"github.com/nickng/scribble-go-examples/1_one-to-many/messages"
 	"github.com/nickng/scribble-go-examples/1_one-to-many/foreach"
+	"github.com/nickng/scribble-go-examples/scributil"
 )
 
-func init() {
-	var data messages.Data
-	gob.Register(&data)
-}
-
-// FIXME: -t=shm crashes
 func main() {
-	listen, dial, fmtr, port, K := scributil.ParseFlags()
+	connAB, K := scributil.ParseFlags()
 	wg := new(sync.WaitGroup)
 	wg.Add(K)
 
-	p := Foreach.New()  // FIXME: K should be param here?
+	p := Foreach.New() // FIXME: K should be param here?
 	for i := 1; i <= K; i++ {
-		go foreach.Server_gather(listen, fmtr, port+i, p, K, i, wg)
+		go foreach.Server_gather(p, K, i, connAB, connAB.Port(i), wg)
 	}
 	time.Sleep(100 * time.Millisecond)
-	foreach.Client_scatter(dial, fmtr, "localhost", port, p, K, 1)
-
+	foreach.Client_scatter(p, K, 1, connAB, "localhost", connAB.BasePort())
 	wg.Wait()
 }

@@ -1,0 +1,17 @@
+module Game;
+
+global protocol Proto1(role P, role Q) {
+	Play(Game@A) from Q[1] to P[1,K];
+}
+
+global protocol Game(role A, role B, role C) {
+	choice at A[1] {
+		Foo() from A[1] to B[1];
+		Foo() from A[1] to C[1];
+		do Game(A, B, C);
+	} or {
+		Bar() from A[1] to B[1];
+		Bar() from A[1] to C[1];
+	}
+}
+

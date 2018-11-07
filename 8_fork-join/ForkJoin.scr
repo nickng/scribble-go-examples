@@ -5,7 +5,7 @@ module ForkJoin;
 sig <go> "message.Map" from "github.com/nickng/scribble-go-examples/8_fork-join/message" as Map;
 sig <go> "message.Red" from "github.com/nickng/scribble-go-examples/8_fork-join/message" as Red;
 
-global protocol ForkJoin(role Master, role Worker) {
+global protocol Protocol(role Master, role Worker) {
   Map from Master[1,1] to Worker[1,K];
   Red from Worker[1,K] to Master[1,1];
 }

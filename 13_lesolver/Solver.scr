@@ -1,0 +1,15 @@
+module Solver;
+
+sig <go> "message.Data" from "github.com/nickng/scribble-go-examples/13_lesolver/message" as Data;
+
+global protocol Solver(role W) {
+  foreach W[I:(1,1),K-(1,0)], W[J:(1,1)+(1,0),K] {
+    Data from W[I] to W[J];
+  }
+}
+
+global protocol Sync(role W) {
+  foreach W[I:(1,1),K-(0,1)], W[J:(1,2),K] {
+    Data from W[I] to W[J];
+  }
+}
