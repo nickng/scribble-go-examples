@@ -15,12 +15,13 @@ import (
 
 // HeadReq is a Scribble HTTP HEAD request wrapper.
 type HeadReq struct {
-	url string
+	url     string
+	Request *http.Request // Request as the server sees it.
 }
 
 // Head creates and wraps a new HTTP HEAD request.
 func Head(url string) HeadReq {
-	return HeadReq{url}
+	return HeadReq{url: url}
 }
 
 // GetOp returns a dummy HeadReq label.
@@ -32,11 +33,12 @@ func (HeadReq) GetOp() string {
 type GetReq struct {
 	url      string
 	from, to int
+	Request  *http.Request // Request as the server sees it.
 }
 
 // Get creates and wraps a new HTTP GET request.
 func Get(url string, from, to int) GetReq {
-	return GetReq{url, from, to}
+	return GetReq{url: url, from: from, to: to}
 }
 
 // GetOp returns a dummy GetReq label.
@@ -47,8 +49,9 @@ func (GetReq) GetOp() string {
 // Response is a Scribble HTTP response wrapper.
 // The body of the response is stored in the Body field.
 type Response struct {
-	Body   []byte
-	Header http.Header
+	Body    []byte
+	Header  http.Header
+	Request *http.Request // original request.
 }
 
 // GetOp returns a dummy Response label.
