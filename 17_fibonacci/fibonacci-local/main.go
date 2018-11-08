@@ -20,7 +20,7 @@ func main() {
 	// K*2-2,K*2-1 : Fib[K-2]->Fib[K], Fib[K-1]->Fib[K]
 
 	if K < 4 {
-		log.Fatalf("cannot start with K=%d (need K >= 4)", K)
+		log.Fatalf("cannot start with K=%d (need K >= 5)", K)
 	}
 
 	wg := new(sync.WaitGroup)
