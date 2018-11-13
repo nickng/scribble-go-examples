@@ -1,4 +1,4 @@
-//go:generate scribblec-param.sh -d ../ ../PGet.scr -param Foreach github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
+//go:generate scribblec-param.sh -d ../../ ../../PGet.scr -param Foreach github.com/nickng/scribble-go-examples/9_pget/PGet -param-api M -param-api F -param-api S
 
 package main
 
